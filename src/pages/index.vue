@@ -17,6 +17,22 @@ import IconGithubLogo from "~icons/ph/github-logo";
 
       <div class="grid md:grid-cols-2 gap-4">
         <RouterLink
+          to="/color"
+          class="group block space-y-2 p-4 bg-white outline outline-gray-200 hover:outline-gray-300 hover:bg-gray-50"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Color Converter</h2>
+            <IconArrowRight
+              class="size-4 text-gray-400 group-hover:text-gray-600 transition-colors"
+            />
+          </div>
+          <p class="text-sm text-gray-600">
+            Convert colors between different formats (HEX, RGB, HSL, etc.) with
+            a live preview.
+          </p>
+        </RouterLink>
+
+        <RouterLink
           to="/secrets"
           class="group block space-y-2 p-4 bg-white outline outline-gray-200 hover:outline-gray-300 hover:bg-gray-50"
         >
