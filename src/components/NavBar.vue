@@ -7,12 +7,15 @@ const [isOpen, toggle] = useToggle();
 <template>
   <header class="grid basis-64 bg-white outline outline-gray-200 px-4 py-3">
     <div class="flex items-center justify-between">
-      <RouterLink to="/" class="text-xs font-medium uppercase tracking-wider">
-        Tools
+      <div class="text-xs font-medium uppercase tracking-wider">
+        <RouterLink to="/" class="underline">Tools</RouterLink>
         <span class="text-xs tracking-wide text-gray-600 mb-4">
-          by <a class="underline" href="https://shivam.dev">shivam.dev</a>
+          by
+          <a class="underline" target="_blank" href="https://shivam.dev">
+            shivam.dev
+          </a>
         </span>
-      </RouterLink>
+      </div>
       <button
         @click="() => toggle()"
         type="button"

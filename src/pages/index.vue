@@ -10,8 +10,8 @@ import { tools } from "../tools";
   <div class="max-w-3xl">
     <div class="space-y-6">
       <div class="space-y-2">
-        <h1 class="text-2xl font-bold text-gray-900">Developer Tools</h1>
-        <p class="text-base text-gray-600">
+        <h1 class="text-xl font-medium tracking-wider">Developer Tools</h1>
+        <p class="text-gray-600 max-w-xl mt-2">
           A collection of useful developer tools that run entirely in your
           browser. Your data never leaves your device.
         </p>

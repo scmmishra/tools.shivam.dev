@@ -11,7 +11,10 @@ import { tools } from "../tools";
       </RouterLink>
 
       <span class="text-xs tracking-wide text-gray-600 mb-4">
-        by <a class="underline" href="https://shivam.dev">shivam.dev</a>
+        by
+        <a class="underline" target="_blank" href="https://shivam.dev">
+          shivam.dev
+        </a>
       </span>
 
       <nav class="space-y-1 -mx-2">
