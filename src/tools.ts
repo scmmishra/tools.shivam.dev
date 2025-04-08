@@ -1,14 +1,32 @@
 import Secrets from "./pages/secrets.vue";
 import Color from "./pages/color.vue";
 import Hmac from "./pages/hmac.vue";
+import Base64 from "./pages/base64.vue";
+import JWT from "./pages/jwt.vue";
 
 export enum Tools {
   Color = "color",
   Hmac = "hmac",
   Secrets = "secrets",
+  Base64 = "base64",
+  JWT = "jwt",
 }
 
 export const tools = [
+  {
+    slug: Tools.Base64,
+    title: "Base64 Decoder",
+    component: Base64,
+    description:
+      "Decode Base64 encoded strings quickly and easily in your browser.",
+  },
+  {
+    slug: Tools.JWT,
+    title: "JWT Decoder",
+    component: JWT,
+    description:
+      "Decode and inspect JSON Web Tokens (JWT) to view their header, payload, and signature.",
+  },
   {
     slug: Tools.Color,
     title: "Color Converter",
