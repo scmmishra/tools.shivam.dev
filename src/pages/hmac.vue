@@ -1,8 +1,14 @@
 <template>
-  <div class="space-y-6">
-    <h1 class="text-xl font-medium uppercase tracking-wider truncate">
-      HMAC Generator
-    </h1>
+  <div class="space-y-6 max-w-3xl">
+    <div>
+      <h1 class="text-xl font-medium tracking-wider truncate">
+        HMAC Generator
+      </h1>
+      <p class="text-gray-600 max-w-xl mt-2">
+        Generate a Hash-based Message Authentication Code (HMAC) to verify
+        message integrity and authenticity using your secret key.
+      </p>
+    </div>
 
     <div class="space-y-2">
       <label for="secretKey" class="block text-sm font-medium text-gray-700"
@@ -27,7 +33,7 @@
         :value="message"
         @input="updateMessage"
         rows="3"
-        class="w-full px-3 py-2 outline outline-gray-200 focus:outline-gray-400 transition-colors resize-none overflow-auto"
+        class="w-full px-3 py-2 outline outline-gray-200 focus:outline-gray-400 transition-colors overflow-auto"
         placeholder="Enter message"
       ></textarea>
     </div>
@@ -56,6 +62,7 @@
       <h3 class="text-sm font-medium text-gray-700">HMAC Result:</h3>
       <p
         class="font-mono px-3 py-2 bg-gray-50 outline outline-gray-200 break-all"
+        :class="hmacResult ? '' : 'text-gray-400'"
       >
         {{ hmacResult || "Enter a message and secret key to generate HMAC" }}
       </p>
