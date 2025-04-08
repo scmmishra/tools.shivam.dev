@@ -18,7 +18,7 @@ import IconGithubLogo from "~icons/ph/github-logo";
       <div class="grid md:grid-cols-2 gap-4">
         <RouterLink
           to="/secrets"
-          class="group block space-y-2 p-4 bg-white rounded-lg outline outline-gray-100 hover:outline-gray-200"
+          class="group block space-y-2 p-4 bg-white outline outline-gray-200 hover:outline-gray-300 hover:bg-gray-50"
         >
           <div class="flex items-center justify-between">
             <h2 class="font-semibold text-gray-900">Secret Generator</h2>
@@ -34,7 +34,7 @@ import IconGithubLogo from "~icons/ph/github-logo";
 
         <RouterLink
           to="/hmac"
-          class="group block space-y-2 p-4 bg-white rounded-lg outline outline-gray-100 hover:outline-gray-200"
+          class="group block space-y-2 p-4 bg-white outline outline-gray-200 hover:outline-gray-300 hover:bg-gray-50"
         >
           <div class="flex items-center justify-between">
             <h2 class="font-semibold text-gray-900">HMAC Generator</h2>
