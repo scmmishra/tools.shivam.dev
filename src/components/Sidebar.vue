@@ -16,6 +16,13 @@
         >
           HMAC Generator
         </RouterLink>
+        <RouterLink
+          to="/secrets"
+          class="block px-2 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+          active-class="text-gray-900 bg-gray-50 outline outline-gray-100"
+        >
+          Secret Generator
+        </RouterLink>
       </nav>
     </div>
   </aside>
