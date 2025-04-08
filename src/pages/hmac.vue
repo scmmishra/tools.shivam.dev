@@ -1,15 +1,8 @@
 <template>
-  <div class="space-y-6 max-w-3xl">
-    <div>
-      <h1 class="text-xl font-medium tracking-wider truncate">
-        HMAC Generator
-      </h1>
-      <p class="text-gray-600 max-w-xl mt-2">
-        Generate a Hash-based Message Authentication Code (HMAC) to verify
-        message integrity and authenticity using your secret key.
-      </p>
-    </div>
-
+  <ToolLayout
+    title="HMAC Generator"
+    description="Generate a Hash-based Message Authentication Code (HMAC) to verify message integrity and authenticity using your secret key."
+  >
     <div class="space-y-2">
       <label for="secretKey" class="block text-sm font-medium text-gray-700"
         >Secret Key:</label
@@ -73,12 +66,13 @@
         Error: {{ error }}
       </p>
     </div>
-  </div>
+  </ToolLayout>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { useDebounceFn } from "@vueuse/core";
+import ToolLayout from "../components/ToolLayout.vue";
 
 const secretKey = ref("");
 const message = ref("");
