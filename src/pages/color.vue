@@ -26,10 +26,8 @@ const convertedColors = computed(() => {
 
   return {
     hex: formatHex(parsed),
-    rgb: formatRgb({ ...parsed, alpha: undefined }),
-    rgba: formatRgb(parsed),
-    hsl: formatHsl({ ...parsed, alpha: undefined }),
-    hsla: formatHsl(parsed),
+    rgb: formatRgb(parsed),
+    hsl: formatHsl(parsed),
   };
 });
 </script>
@@ -48,7 +46,7 @@ const convertedColors = computed(() => {
           id="color-input"
           label="Enter Color"
           persist="color-input"
-          placeholder="e.g. #ff0000, rgb(255, 0, 0), hsl(0, 100%, 50%)"
+          placeholder="e.g. #ff0000, rgb(255, 0, 0), hsl(0, 100%, 50%), skyblue"
         />
       </div>
 
@@ -67,24 +65,14 @@ const convertedColors = computed(() => {
           :value="isValid ? convertedColors.hex || '' : ''"
         />
         <Result
-          title="RGB"
-          placeholder="Color in RGB"
+          title="RGB / RGBA"
+          placeholder="Color in RGB / RGBA"
           :value="isValid ? convertedColors.rgb || '' : ''"
         />
         <Result
-          title="RGBA"
-          placeholder="Color in RGBA"
-          :value="isValid ? convertedColors.rgba || '' : ''"
-        />
-        <Result
-          title="HSL"
-          placeholder="Color in HSL"
+          title="HSL / HSLA"
+          placeholder="Color in HSL / HSLA"
           :value="isValid ? convertedColors.hsl || '' : ''"
-        />
-        <Result
-          title="HSLA"
-          placeholder="Color in HSLA"
-          :value="isValid ? convertedColors.hsla || '' : ''"
         />
       </div>
 
