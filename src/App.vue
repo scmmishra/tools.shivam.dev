@@ -1,5 +1,8 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>Testing Vue</div>
+  <aside>Testing Vue</aside>
+  <main>
+    <RouterView />
+  </main>
 </template>
