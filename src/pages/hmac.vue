@@ -31,21 +31,12 @@
       persist="hmac-algorithm"
     />
 
-    <div class="space-y-2">
-      <h3 class="text-sm font-medium text-gray-700">HMAC Result:</h3>
-      <p
-        class="font-mono px-3 py-2 bg-gray-50 outline outline-gray-200 break-all"
-        :class="hmacResult ? '' : 'text-gray-400'"
-      >
-        {{ hmacResult || "Enter a message and secret key to generate HMAC" }}
-      </p>
-      <p
-        v-if="error"
-        class="font-mono px-3 py-2 bg-red-50 outline outline-red-200 text-red-600 break-all"
-      >
-        Error: {{ error }}
-      </p>
-    </div>
+    <Result
+      title="HMAC Result"
+      :value="hmacResult"
+      placeholder="Enter a message and secret key to generate HMAC"
+      :error="error"
+    />
   </ToolLayout>
 </template>
 
@@ -56,6 +47,7 @@ import ToolLayout from "../components/ToolLayout.vue";
 import TextInput from "../components/form/TextInput.vue";
 import TextArea from "../components/form/TextArea.vue";
 import Select from "../components/form/Select.vue";
+import Result from "../components/Result.vue";
 
 const secretKey = ref("");
 const message = ref("");
