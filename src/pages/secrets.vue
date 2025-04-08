@@ -67,17 +67,14 @@ generateSecret();
         </div>
       </div>
 
-      <Result title="Generated Secret" :value="secret">
-        <template #action>
-          <button
-            @click="generateSecret"
-            class="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1.5 cursor-pointer"
-          >
-            <IconArrowClockwise class="size-3" />
-            Generate new
-          </button>
-        </template>
-      </Result>
+      <Result title="Generated Secret" :value="secret" />
+      <button
+        @click="generateSecret"
+        class="text-sm w-full text-gray-100 hover:bg-gray-800 flex items-center gap-2 cursor-pointer bg-gray-900 py-3 justify-center px-4"
+      >
+        <IconArrowClockwise class="size-3" />
+        Generate new secret
+      </button>
     </div>
   </ToolLayout>
 </template>
