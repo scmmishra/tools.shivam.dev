@@ -29,7 +29,7 @@ usePersist(props.persist, model);
 </script>
 
 <template>
-  <WithLabel :label="label" :for="id">
+  <WithLabel :label="label" :html-for="id">
     <input
       type="number"
       :id="id"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import WithLabel from "./WithLabel.vue";
-import { usePersist } from '../../composables/usePersist'
+import { usePersist } from "../../composables/usePersist";
 
 const model = defineModel<string>();
 
@@ -13,11 +13,11 @@ const props = defineProps<{
 }>();
 
 // Setup persistence if key is provided
-usePersist(props.persist, model)
+usePersist(props.persist, model);
 </script>
 
 <template>
-  <WithLabel :label="label" :for="id">
+  <WithLabel :label="label" :html-for="id">
     <textarea
       :id="id"
       :value="model"

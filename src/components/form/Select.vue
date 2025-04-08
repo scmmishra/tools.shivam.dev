@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import WithLabel from './WithLabel.vue'
-import { usePersist } from '../../composables/usePersist'
+import WithLabel from "./WithLabel.vue";
+import { usePersist } from "../../composables/usePersist";
 
-const model = defineModel<string>()
+const model = defineModel<string>();
 
 const props = defineProps<{
-  label: string
-  id: string
-  options: { value: string; label?: string }[]
-  persist?: string
-}>()
+  label: string;
+  id: string;
+  options: { value: string; label?: string }[];
+  persist?: string;
+}>();
 
 // Setup persistence if key is provided
-usePersist(props.persist, model)
+usePersist(props.persist, model);
 </script>
 
 <template>
-  <WithLabel :label="label" :for="id">
+  <WithLabel :label="label" :html-for="id">
     <select
       :id="id"
       :value="model"
