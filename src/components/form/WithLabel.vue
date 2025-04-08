@@ -7,7 +7,10 @@ defineProps<{
 
 <template>
   <div class="space-y-2">
-    <label :html-for="htmlFor" class="block text-sm font-medium text-gray-700">
+    <label
+      :html-for="htmlFor"
+      class="block text-xs uppercase tracking-wider text-gray-500"
+    >
       {{ label }}
     </label>
     <slot></slot>

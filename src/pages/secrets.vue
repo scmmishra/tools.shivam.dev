@@ -49,7 +49,8 @@ generateSecret();
           />
         </div>
         <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-2"
+          <label
+            class="block block text-xs uppercase tracking-wider text-gray-500 mb-2"
             >Options</label
           >
           <label class="flex items-center gap-2">
