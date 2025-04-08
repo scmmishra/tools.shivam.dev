@@ -24,7 +24,7 @@ const clearCache = () => {
 </script>
 
 <template>
-  <div class="max-w-3xl flex flex-col h-full gap-6 justify-between">
+  <div class="max-w-2xl lex flex-col h-full gap-6 justify-between">
     <section class="space-y-6 flex-grow">
       <div>
         <h1 class="text-xl font-medium tracking-wider truncate">
