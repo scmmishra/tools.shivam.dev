@@ -7,7 +7,7 @@ import { tools } from "../tools";
 </script>
 
 <template>
-  <div class="max-w-3xl px-4">
+  <div class="max-w-3xl">
     <div class="space-y-6">
       <div class="space-y-2">
         <h1 class="text-2xl font-bold text-gray-900">Developer Tools</h1>

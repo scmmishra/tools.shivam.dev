@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Sidebar from "./components/Sidebar.vue";
+import NavBar from "./components/NavBar.vue";
 import CommandPalette from "./components/CommandPalette.vue";
 import { ref, onMounted, onUnmounted } from "vue";
 import { tools } from "./tools";
@@ -29,11 +30,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex bg-gray-50">
-    <Sidebar />
+  <div class="flex flex-wrap bg-gray-50">
+    <Sidebar class="hidden sm:grid" />
     <main
-      class="basis-0 flex-grow-[999] [min-inline-size_50%] min-h-screen p-3"
+      class="basis-0 flex-grow-[999] min-h-screen p-3"
+      style="min-inline-size: 60%"
     >
+      <NavBar class="sm:hidden mb-2" />
       <div class="bg-white outline outline-gray-200 h-full px-4 py-3">
         <RouterView />
       </div>
