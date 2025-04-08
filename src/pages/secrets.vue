@@ -4,7 +4,6 @@ import Shifty from "@deepsource/shifty";
 import ToolLayout from "../components/ToolLayout.vue";
 import NumberInput from "../components/form/NumberInput.vue";
 import IconArrowClockwise from "~icons/ph/arrow-clockwise";
-import IconCopy from "~icons/ph/copy";
 import Result from "../components/Result.vue";
 
 const length = ref(16);

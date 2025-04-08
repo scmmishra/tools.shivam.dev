@@ -58,13 +58,13 @@ async function generateHmac() {
 
 const debouncedGenerateHmac = useDebounceFn(generateHmac, 500);
 
-const updateMessage = (newValue: string) => {
-  message.value = newValue;
+const updateMessage = (newValue: string | undefined) => {
+  message.value = newValue ?? "";
   debouncedGenerateHmac();
 };
 
-const updateSecretKey = (newValue: string) => {
-  secretKey.value = newValue;
+const updateSecretKey = (newValue: string | undefined) => {
+  secretKey.value = newValue ?? "";
   debouncedGenerateHmac();
 };
 
@@ -85,7 +85,7 @@ const updateAlgorithm = (newValue: string) => {
       label="Secret Key"
       placeholder="Enter secret key"
       v-model="secretKey"
-      @update:modelValue="updateSecretKey"
+      @update="updateSecretKey"
       persist="hmac-secret-key"
     />
 
@@ -94,7 +94,7 @@ const updateAlgorithm = (newValue: string) => {
       label="Message"
       placeholder="Enter message"
       v-model="message"
-      @update:modelValue="updateMessage"
+      @update="updateMessage"
       persist="hmac-message"
     />
 
@@ -103,7 +103,7 @@ const updateAlgorithm = (newValue: string) => {
       label="Algorithm"
       :options="algorithmOptions"
       v-model="algorithm"
-      @update:modelValue="updateAlgorithm"
+      @update="updateAlgorithm"
       persist="hmac-algorithm"
     />
 
