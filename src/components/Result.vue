@@ -47,7 +47,15 @@ const handleCopy = async () => {
         @click="handleCopy"
         class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
       >
-        <Transition mode="out-in">
+        <Transition
+          mode="out-in"
+          enter-active-class="transition ease-out duration-100"
+          enter-from-class="transform -translate-y-2 opacity-0"
+          enter-to-class="transform translate-y-0 opacity-100"
+          leave-active-class="transition ease-in duration-100"
+          leave-from-class="transform translate-y-0 opacity-100"
+          leave-to-class="transform translate-y-2 opacity-0"
+        >
           <IconCheck v-if="isJustCopied" class="size-4 text-green-500" />
           <IconCopy v-else class="size-4" />
         </Transition>
