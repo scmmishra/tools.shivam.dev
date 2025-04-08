@@ -4,7 +4,7 @@ import { tools } from "../tools";
 <template>
   <aside class="sticky top-0 grid h-screen p-3 pr-0 basis-64">
     <div
-      class="flex flex-col h-full bg-white outline outline-gray-200 shadow px-4 py-3"
+      class="flex flex-col h-full bg-white outline outline-gray-200 px-4 py-3"
     >
       <RouterLink to="/" class="text-xl font-medium uppercase tracking-wider">
         Tools
