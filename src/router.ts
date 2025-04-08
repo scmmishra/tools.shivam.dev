@@ -1,17 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Hmac from "./pages/hmac.vue";
-import Secrets from "./pages/secrets.vue";
-import Color from "./pages/color.vue";
 import Index from "./pages/index.vue";
+
+import { tools } from "./tools";
+
+const toolPages = tools.map((tool) => ({
+  path: `/${tool.slug}`,
+  component: tool.component,
+}));
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    { path: "/", component: Index },
-    { path: "/hmac", component: Hmac },
-    { path: "/Color", component: Color },
-    { path: "/secrets", component: Secrets },
-  ],
+  routes: [{ path: "/", component: Index }, ...toolPages],
 });
 
 export default router;

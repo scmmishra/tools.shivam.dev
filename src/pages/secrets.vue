@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { Tools } from "../tools";
 import Shifty from "@deepsource/shifty";
 import ToolLayout from "../components/ToolLayout.vue";
 import NumberInput from "../components/form/NumberInput.vue";
@@ -30,8 +31,7 @@ generateSecret();
 
 <template>
   <ToolLayout
-    title="Secret Generator"
-    description="Generate cryptographically secure secrets and passwords for your applications."
+    :name="Tools.Secrets"
     :persist-keys="['secrets-length', 'secrets-harden']"
   >
     <div class="space-y-6">

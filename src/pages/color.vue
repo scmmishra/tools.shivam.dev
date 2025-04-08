@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { Tools } from "../tools";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextInput from "../components/form/TextInput.vue";
 import Result from "../components/Result.vue";
@@ -33,11 +34,7 @@ const convertedColors = computed(() => {
 </script>
 
 <template>
-  <ToolLayout
-    title="Color Converter"
-    description="Convert colors between different formats."
-    :persist-keys="['color-input']"
-  >
+  <ToolLayout :name="Tools.Color" :persist-keys="['color-input']">
     <div class="space-y-6">
       <!-- Input Section -->
       <div>

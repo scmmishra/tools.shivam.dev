@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useDebounceFn } from "@vueuse/core";
+
+import { Tools } from "../tools";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextInput from "../components/form/TextInput.vue";
 import TextArea from "../components/form/TextArea.vue";
@@ -76,8 +78,7 @@ const updateAlgorithm = (newValue: string) => {
 
 <template>
   <ToolLayout
-    title="HMAC Generator"
-    description="Generate a Hash-based Message Authentication Code (HMAC) to verify message integrity and authenticity using your secret key."
+    :name="Tools.Hmac"
     :persist-keys="['hmac-secret-key', 'hmac-message', 'hmac-algorithm']"
   >
     <TextInput

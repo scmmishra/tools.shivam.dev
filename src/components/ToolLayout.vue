@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { tools, Tools } from "../tools";
+
 const props = defineProps<{
-  title: string;
-  description?: string;
+  name: Tools;
   persistKeys?: string[];
 }>();
+
+const currentTool = computed(() =>
+  tools.find((tool) => tool.slug === props.name)
+);
 
 const clearCache = () => {
   if (!props.persistKeys?.length) return;
@@ -22,11 +28,14 @@ const clearCache = () => {
     <section class="space-y-6 flex-grow">
       <div>
         <h1 class="text-xl font-medium tracking-wider truncate">
-          {{ title }}
+          {{ currentTool?.title }}
         </h1>
         <div class="text-gray-600 max-w-xl mt-2">
-          <p v-if="description">{{ description }}</p>
-          <slot name="description"></slot>
+          <slot name="description">
+            <p v-if="currentTool?.description">
+              {{ currentTool?.description }}
+            </p>
+          </slot>
         </div>
       </div>
 
