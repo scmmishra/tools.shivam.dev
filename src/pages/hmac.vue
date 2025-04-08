@@ -3,53 +3,29 @@
     title="HMAC Generator"
     description="Generate a Hash-based Message Authentication Code (HMAC) to verify message integrity and authenticity using your secret key."
   >
-    <div class="space-y-2">
-      <label for="secretKey" class="block text-sm font-medium text-gray-700"
-        >Secret Key:</label
-      >
-      <input
-        type="text"
-        id="secretKey"
-        :value="secretKey"
-        @input="updateSecretKey"
-        class="w-full px-3 py-2 outline outline-gray-200 focus:outline-gray-400 transition-colors overflow-hidden"
-        placeholder="Enter secret key"
-      />
-    </div>
+    <TextInput
+      id="secretKey"
+      label="Secret Key"
+      placeholder="Enter secret key"
+      v-model="secretKey"
+      @update:modelValue="updateSecretKey"
+    />
 
-    <div class="space-y-2">
-      <label for="message" class="block text-sm font-medium text-gray-700"
-        >Message:</label
-      >
-      <textarea
-        id="message"
-        :value="message"
-        @input="updateMessage"
-        rows="3"
-        class="w-full px-3 py-2 outline outline-gray-200 focus:outline-gray-400 transition-colors overflow-auto"
-        placeholder="Enter message"
-      ></textarea>
-    </div>
+    <TextArea
+      id="message"
+      label="Message"
+      placeholder="Enter message"
+      v-model="message"
+      @update:modelValue="updateMessage"
+    />
 
-    <div class="space-y-2">
-      <label for="algorithm" class="block text-sm font-medium text-gray-700"
-        >Algorithm:</label
-      >
-      <select
-        id="algorithm"
-        :value="algorithm"
-        @change="updateAlgorithm"
-        class="w-full px-3 py-2 outline outline-gray-200 focus:outline-gray-400 transition-colors overflow-hidden"
-      >
-        <option
-          v-for="option in algorithmOptions"
-          :key="option"
-          :value="option"
-        >
-          {{ option }}
-        </option>
-      </select>
-    </div>
+    <Select
+      id="algorithm"
+      label="Algorithm"
+      :options="algorithmOptions"
+      v-model="algorithm"
+      @update:modelValue="updateAlgorithm"
+    />
 
     <div class="space-y-2">
       <h3 class="text-sm font-medium text-gray-700">HMAC Result:</h3>
@@ -73,12 +49,19 @@
 import { ref } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import ToolLayout from "../components/ToolLayout.vue";
+import TextInput from "../components/form/TextInput.vue";
+import TextArea from "../components/form/TextArea.vue";
+import Select from "../components/form/Select.vue";
 
 const secretKey = ref("");
 const message = ref("");
 const algorithm = ref("SHA-256");
 const hmacResult = ref("");
 const error = ref("");
+
+const algorithmOptions = ["SHA-256", "SHA-384", "SHA-512"].map((value) => ({
+  value,
+}));
 
 async function generateHmac() {
   if (!secretKey.value && !message.value) {
@@ -121,20 +104,18 @@ async function generateHmac() {
 
 const debouncedGenerateHmac = useDebounceFn(generateHmac, 500);
 
-const updateMessage = (event) => {
-  message.value = event.target.value;
+const updateMessage = (newValue) => {
+  message.value = newValue;
   debouncedGenerateHmac();
 };
 
-const updateSecretKey = (event) => {
-  secretKey.value = event.target.value;
+const updateSecretKey = (newValue) => {
+  secretKey.value = newValue;
   debouncedGenerateHmac();
 };
 
-const updateAlgorithm = (event) => {
-  algorithm.value = event.target.value;
+const updateAlgorithm = (newValue) => {
+  algorithm.value = newValue;
   debouncedGenerateHmac();
 };
-
-const algorithmOptions = ["SHA-256", "SHA-384", "SHA-512"];
 </script>
