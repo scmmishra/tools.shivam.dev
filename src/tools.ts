@@ -19,6 +19,7 @@ export const tools = [
     component: Base64,
     description:
       "Decode Base64 encoded strings quickly and easily in your browser.",
+    icon: "carbon:data-base",
   },
   {
     slug: Tools.JWT,

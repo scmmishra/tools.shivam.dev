@@ -1,5 +1,31 @@
 <script setup lang="ts">
 import Sidebar from "./components/Sidebar.vue";
+import CommandPalette from "./components/CommandPalette.vue";
+import { ref, onMounted, onUnmounted } from "vue";
+import { tools } from "./tools";
+
+const commandPalette = ref<InstanceType<typeof CommandPalette> | null>(null);
+
+const navigationTools = tools.map((tool) => ({
+  name: tool.title,
+  path: `/${tool.slug}`,
+  description: tool.description,
+}));
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    commandPalette.value?.showModal();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", handleKeydown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeydown);
+});
 </script>
 
 <template>
@@ -12,5 +38,7 @@ import Sidebar from "./components/Sidebar.vue";
         <RouterView />
       </div>
     </main>
+
+    <CommandPalette ref="commandPalette" :tools="navigationTools" />
   </div>
 </template>
