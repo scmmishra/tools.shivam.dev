@@ -1,46 +1,4 @@
-<template>
-  <ToolLayout
-    title="HMAC Generator"
-    description="Generate a Hash-based Message Authentication Code (HMAC) to verify message integrity and authenticity using your secret key."
-    :persist-keys="['hmac-secret-key', 'hmac-message', 'hmac-algorithm']"
-  >
-    <TextInput
-      id="secretKey"
-      label="Secret Key"
-      placeholder="Enter secret key"
-      v-model="secretKey"
-      @update:modelValue="updateSecretKey"
-      persist="hmac-secret-key"
-    />
-
-    <TextArea
-      id="message"
-      label="Message"
-      placeholder="Enter message"
-      v-model="message"
-      @update:modelValue="updateMessage"
-      persist="hmac-message"
-    />
-
-    <Select
-      id="algorithm"
-      label="Algorithm"
-      :options="algorithmOptions"
-      v-model="algorithm"
-      @update:modelValue="updateAlgorithm"
-      persist="hmac-algorithm"
-    />
-
-    <Result
-      title="HMAC Result"
-      :value="hmacResult"
-      placeholder="Enter a message and secret key to generate HMAC"
-      :error="error"
-    />
-  </ToolLayout>
-</template>
-
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import ToolLayout from "../components/ToolLayout.vue";
@@ -94,24 +52,66 @@ async function generateHmac() {
     error.value = "";
   } catch (err) {
     hmacResult.value = "";
-    error.value = err.message;
+    error.value = (err as Error).message;
   }
 }
 
 const debouncedGenerateHmac = useDebounceFn(generateHmac, 500);
 
-const updateMessage = (newValue) => {
+const updateMessage = (newValue: string) => {
   message.value = newValue;
   debouncedGenerateHmac();
 };
 
-const updateSecretKey = (newValue) => {
+const updateSecretKey = (newValue: string) => {
   secretKey.value = newValue;
   debouncedGenerateHmac();
 };
 
-const updateAlgorithm = (newValue) => {
+const updateAlgorithm = (newValue: string) => {
   algorithm.value = newValue;
   debouncedGenerateHmac();
 };
 </script>
+
+<template>
+  <ToolLayout
+    title="HMAC Generator"
+    description="Generate a Hash-based Message Authentication Code (HMAC) to verify message integrity and authenticity using your secret key."
+    :persist-keys="['hmac-secret-key', 'hmac-message', 'hmac-algorithm']"
+  >
+    <TextInput
+      id="secretKey"
+      label="Secret Key"
+      placeholder="Enter secret key"
+      v-model="secretKey"
+      @update:modelValue="updateSecretKey"
+      persist="hmac-secret-key"
+    />
+
+    <TextArea
+      id="message"
+      label="Message"
+      placeholder="Enter message"
+      v-model="message"
+      @update:modelValue="updateMessage"
+      persist="hmac-message"
+    />
+
+    <Select
+      id="algorithm"
+      label="Algorithm"
+      :options="algorithmOptions"
+      v-model="algorithm"
+      @update:modelValue="updateAlgorithm"
+      persist="hmac-algorithm"
+    />
+
+    <Result
+      title="HMAC Result"
+      :value="hmacResult"
+      placeholder="Enter a message and secret key to generate HMAC"
+      :error="error"
+    />
+  </ToolLayout>
+</template>
