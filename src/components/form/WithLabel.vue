@@ -1,13 +1,15 @@
 <script setup lang="ts">
 defineProps<{
-  label: string
-  for: string
-}>()
+  label: string;
+  htmlFor: string;
+}>();
 </script>
 
 <template>
   <div class="space-y-2">
-    <label :for="for" class="block text-sm font-medium text-gray-700">{{ label }}</label>
+    <label :for="htmlFor" class="block text-sm font-medium text-gray-700">
+      {{ label }}
+    </label>
     <slot></slot>
   </div>
 </template>
