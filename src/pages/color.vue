@@ -52,7 +52,7 @@ const convertedColors = computed(() => {
 
       <div v-if="isValid" class="flex items-center space-x-4">
         <div
-          class="w-12 h-12 rounded-lg shadow-inner"
+          class="w-12 h-12 rounded-lg shadow-inner outline outline-gray-200"
           :style="{ backgroundColor: color }"
         ></div>
         <p class="text-sm text-gray-600">Color Preview</p>
