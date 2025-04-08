@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import WithLabel from "./WithLabel.vue";
+import { usePersist } from '../../composables/usePersist'
 
 const model = defineModel<string>();
 
-defineProps<{
+const props = defineProps<{
   label: string;
   id: string;
   placeholder?: string;
   rows?: number;
+  persist?: string;
 }>();
+
+// Setup persistence if key is provided
+usePersist(props.persist, model)
 </script>
 
 <template>

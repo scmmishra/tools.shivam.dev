@@ -2,6 +2,7 @@
   <ToolLayout
     title="HMAC Generator"
     description="Generate a Hash-based Message Authentication Code (HMAC) to verify message integrity and authenticity using your secret key."
+    :persist-keys="['hmac-secret-key', 'hmac-message', 'hmac-algorithm']"
   >
     <TextInput
       id="secretKey"
@@ -9,6 +10,7 @@
       placeholder="Enter secret key"
       v-model="secretKey"
       @update:modelValue="updateSecretKey"
+      persist="hmac-secret-key"
     />
 
     <TextArea
@@ -17,6 +19,7 @@
       placeholder="Enter message"
       v-model="message"
       @update:modelValue="updateMessage"
+      persist="hmac-message"
     />
 
     <Select
@@ -25,6 +28,7 @@
       :options="algorithmOptions"
       v-model="algorithm"
       @update:modelValue="updateAlgorithm"
+      persist="hmac-algorithm"
     />
 
     <div class="space-y-2">

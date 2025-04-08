@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import WithLabel from './WithLabel.vue'
+import WithLabel from "./WithLabel.vue";
+import { usePersist } from "../../composables/usePersist";
 
-const model = defineModel()
+const model = defineModel<string>();
 
-defineProps<{
-  label: string
-  id: string
-  placeholder?: string
-}>()
+const props = defineProps<{
+  label: string;
+  id: string;
+  placeholder?: string;
+  persist?: string;
+}>();
+
+usePersist(props.persist, model);
 </script>
 
 <template>
