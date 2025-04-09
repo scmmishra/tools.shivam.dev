@@ -95,14 +95,3 @@ const languageOptions = [
     </div>
   </ToolLayout>
 </template>
-
-<style>
-.shiki-wrapper {
-  font-family: "Geist Mono Variable", monospace;
-}
-.shiki-wrapper :deep(pre) {
-  margin: 0;
-  padding: 0;
-  background: transparent !important;
-}
-</style>
