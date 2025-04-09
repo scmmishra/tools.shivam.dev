@@ -2,6 +2,7 @@ import Secrets from "./pages/secrets.vue";
 import Color from "./pages/color.vue";
 import Hmac from "./pages/hmac.vue";
 import Base64 from "./pages/base64.vue";
+import Base64Encode from "./pages/base64-encode.vue";
 import JWT from "./pages/jwt.vue";
 
 export enum Tools {
@@ -9,6 +10,7 @@ export enum Tools {
   Hmac = "hmac",
   Secrets = "secrets",
   Base64 = "base64",
+  Base64Encode = "base64-encode",
   JWT = "jwt",
 }
 
@@ -20,6 +22,14 @@ export const tools = [
     description:
       "Decode Base64 encoded strings quickly and easily in your browser.",
     icon: "carbon:data-base",
+  },
+  {
+    slug: Tools.Base64Encode,
+    title: "Base64 Encoder",
+    component: Base64Encode,
+    description:
+      "Encode strings to Base64 format quickly and easily in your browser.",
+    icon: "carbon:data-base-alt",
   },
   {
     slug: Tools.JWT,
