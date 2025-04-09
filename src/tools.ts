@@ -6,12 +6,14 @@ import Base64Encode from "./pages/base64-encode.vue";
 import JWT from "./pages/jwt.vue";
 import Diff from "./pages/diff.vue";
 import WordCounter from "./pages/word-counter.vue";
+import SqlFormatter from "./pages/sql-formatter.vue";
 
 export enum Category {
   Encoding = "encoding",
   Security = "security",
   CSS = "css",
   Text = "text",
+  Dev = "dev",
 }
 
 export enum Tools {
@@ -23,6 +25,7 @@ export enum Tools {
   JWT = "jwt",
   Diff = "diff",
   WordCounter = "word-counter",
+  SqlFormatter = "sql-formatter",
 }
 
 export const tools = [
@@ -93,5 +96,13 @@ export const tools = [
       "Count characters, words, sentences, and paragraphs in your text with real-time statistics.",
     icon: "carbon:text-annotation-toggle",
     category: Category.Text,
+  },
+  {
+    slug: Tools.SqlFormatter,
+    title: "SQL Formatter",
+    component: SqlFormatter,
+    description: "Format and beautify SQL queries with syntax highlighting.",
+    icon: "carbon:data-base",
+    category: Category.Dev,
   },
 ];

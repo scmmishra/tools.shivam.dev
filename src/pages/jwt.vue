@@ -65,12 +65,14 @@ const updateInput = (newValue: string | undefined) => {
 
       <Result
         title="Header"
+        is="pre"
         placeholder="JWT header will appear here"
         :value="decoded ? JSON.stringify(decoded.header, null, 2) : ''"
       />
 
       <Result
         title="Payload"
+        is="pre"
         placeholder="JWT payload will appear here"
         :value="decoded ? JSON.stringify(decoded.payload, null, 2) : ''"
       />
