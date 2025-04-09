@@ -5,6 +5,7 @@ import Base64 from "./pages/base64.vue";
 import Base64Encode from "./pages/base64-encode.vue";
 import JWT from "./pages/jwt.vue";
 import Diff from "./pages/diff.vue";
+import WordCounter from "./pages/word-counter.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -21,6 +22,7 @@ export enum Tools {
   Base64Encode = "base64-encode",
   JWT = "jwt",
   Diff = "diff",
+  WordCounter = "word-counter",
 }
 
 export const tools = [
@@ -81,6 +83,15 @@ export const tools = [
     description:
       "Compare two texts and see their differences highlighted, with support for character, word, and line-based diffing.",
     icon: "carbon:compare",
+    category: Category.Text,
+  },
+  {
+    slug: Tools.WordCounter,
+    title: "Word Counter",
+    component: WordCounter,
+    description:
+      "Count characters, words, sentences, and paragraphs in your text with real-time statistics.",
+    icon: "carbon:text-annotation-toggle",
     category: Category.Text,
   },
 ];
