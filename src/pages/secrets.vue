@@ -50,9 +50,10 @@ generateSecret();
         </div>
         <div class="flex-1">
           <label
-            class="block block text-xs uppercase tracking-wider text-gray-500 mb-2"
-            >Options</label
+            class="block text-xs uppercase tracking-wider text-gray-500 mb-2"
           >
+            Options
+          </label>
           <label class="flex items-center gap-2">
             <input
               type="checkbox"
