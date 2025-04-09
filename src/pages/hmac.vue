@@ -4,7 +4,7 @@ import { useDebounceFn } from "@vueuse/core";
 
 import { Tools } from "../tools";
 import ToolLayout from "../components/ToolLayout.vue";
-import TextInput from "../components/form/TextInput.vue";
+import HiddenInput from "../components/form/HiddenInput.vue";
 import TextArea from "../components/form/TextArea.vue";
 import Select from "../components/form/Select.vue";
 import Result from "../components/Result.vue";
@@ -81,38 +81,40 @@ const updateAlgorithm = (newValue: string) => {
     :name="Tools.Hmac"
     :persist-keys="['hmac-secret-key', 'hmac-message', 'hmac-algorithm']"
   >
-    <TextInput
-      id="secretKey"
-      label="Secret Key"
-      placeholder="Enter secret key"
-      v-model="secretKey"
-      @update="updateSecretKey"
-      persist="hmac-secret-key"
-    />
+    <div class="space-y-6">
+      <HiddenInput
+        id="secretKey"
+        label="Secret Key"
+        placeholder="Enter secret key"
+        v-model="secretKey"
+        @update="updateSecretKey"
+        persist="hmac-secret-key"
+      />
 
-    <TextArea
-      id="message"
-      label="Message"
-      placeholder="Enter message"
-      v-model="message"
-      @update="updateMessage"
-      persist="hmac-message"
-    />
+      <TextArea
+        id="message"
+        label="Message"
+        placeholder="Enter message"
+        v-model="message"
+        @update="updateMessage"
+        persist="hmac-message"
+      />
 
-    <Select
-      id="algorithm"
-      label="Algorithm"
-      :options="algorithmOptions"
-      v-model="algorithm"
-      @update="updateAlgorithm"
-      persist="hmac-algorithm"
-    />
+      <Select
+        id="algorithm"
+        label="Algorithm"
+        :options="algorithmOptions"
+        v-model="algorithm"
+        @update="updateAlgorithm"
+        persist="hmac-algorithm"
+      />
 
-    <Result
-      title="HMAC Result"
-      :value="hmacResult"
-      placeholder="Enter a message and secret key to generate HMAC"
-      :error="error"
-    />
+      <Result
+        title="HMAC Result"
+        :value="hmacResult"
+        placeholder="Enter a message and secret key to generate HMAC"
+        :error="error"
+      />
+    </div>
   </ToolLayout>
 </template>
