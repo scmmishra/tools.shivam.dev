@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 
 import { Tools } from "../tools";
+import { calculateFleschReadingEase } from "../utils.js/readability";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextArea from "../components/form/TextArea.vue";
 import Result from "../components/Result.vue";
@@ -47,6 +48,8 @@ const stats = computed(() => {
     paragraphs,
   };
 });
+
+const readability = computed(() => calculateFleschReadingEase(text.value));
 </script>
 
 <template>
@@ -70,6 +73,11 @@ const stats = computed(() => {
         <Result title="Words" :value="stats.words.toString()" />
         <Result title="Sentences" :value="stats.sentences.toString()" />
         <Result title="Paragraphs" :value="stats.paragraphs.toString()" />
+        <Result
+          disable-copy
+          title="Readability"
+          :value="`${readability.score} / 10`"
+        />
       </div>
     </div>
   </ToolLayout>
