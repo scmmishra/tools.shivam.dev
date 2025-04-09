@@ -7,7 +7,7 @@ import { tools } from "../tools";
 </script>
 
 <template>
-  <div class="max-w-3xl">
+  <div class="max-w-4xl">
     <div class="space-y-6">
       <div class="space-y-2">
         <h1 class="text-xl font-medium tracking-wider">Developer Tools</h1>
@@ -17,7 +17,7 @@ import { tools } from "../tools";
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-4">
+      <div class="grid md:grid-cols-3 gap-4">
         <RouterLink
           v-for="tool in tools"
           :to="`/${tool.slug}`"
