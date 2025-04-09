@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, computed } from "vue";
+import { ref, defineProps, defineEmits } from "vue";
 import IconLock from "~icons/ph/lock";
 import IconLockOpen from "~icons/ph/lock-open";
 
-const props = defineProps<{
+defineProps<{
   modelValue: string;
   label: string;
   placeholder?: string;
