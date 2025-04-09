@@ -6,7 +6,7 @@ import IconCheck from "~icons/ph/check";
 
 const props = defineProps<{
   title: string;
-  value: string;
+  value?: string;
   placeholder?: string;
   error?: string;
 }>();
@@ -16,6 +16,8 @@ const isJustCopied = ref(false);
 let timeout: ReturnType<typeof setTimeout>;
 
 const handleCopy = async () => {
+  if (!props.value) return;
+
   await copy(props.value);
   isJustCopied.value = true;
 
@@ -42,7 +44,9 @@ const handleCopy = async () => {
         class="font-mono px-3 py-2 bg-gray-50 outline outline-gray-200 break-all"
         :class="value ? '' : 'text-gray-400'"
       >
-        {{ value || placeholder }}
+        <slot>
+          {{ value || placeholder }}
+        </slot>
       </p>
       <button
         v-if="value"

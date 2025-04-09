@@ -4,11 +4,13 @@ import Hmac from "./pages/hmac.vue";
 import Base64 from "./pages/base64.vue";
 import Base64Encode from "./pages/base64-encode.vue";
 import JWT from "./pages/jwt.vue";
+import Diff from "./pages/diff.vue";
 
 export enum Category {
   Encoding = "encoding",
   Security = "security",
   CSS = "css",
+  Text = "text",
 }
 
 export enum Tools {
@@ -18,6 +20,7 @@ export enum Tools {
   Base64 = "base64",
   Base64Encode = "base64-encode",
   JWT = "jwt",
+  Diff = "diff",
 }
 
 export const tools = [
@@ -70,5 +73,14 @@ export const tools = [
     description:
       "Generate cryptographically secure secrets and passwords with configurable length and special characters.",
     category: Category.Security,
+  },
+  {
+    slug: Tools.Diff,
+    title: "Text Diff",
+    component: Diff,
+    description:
+      "Compare two texts and see their differences highlighted, with support for character, word, and line-based diffing.",
+    icon: "carbon:compare",
+    category: Category.Text,
   },
 ];
