@@ -7,6 +7,7 @@ import JWT from "./pages/jwt.vue";
 import Diff from "./pages/diff.vue";
 import WordCounter from "./pages/word-counter.vue";
 import SqlFormatter from "./pages/sql-formatter.vue";
+import JsonFormatter from "./pages/json-formatter.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -26,6 +27,7 @@ export enum Tools {
   Diff = "diff",
   WordCounter = "word-counter",
   SqlFormatter = "sql-formatter",
+  JsonFormatter = "json-formatter",
 }
 
 export const tools = [
@@ -103,6 +105,15 @@ export const tools = [
     component: SqlFormatter,
     description: "Format and beautify SQL queries with syntax highlighting.",
     icon: "carbon:data-base",
+    category: Category.Dev,
+  },
+  {
+    slug: Tools.JsonFormatter,
+    title: "JSON Formatter",
+    component: JsonFormatter,
+    description:
+      "Format and prettify your JSON data instantly in your browser.",
+    icon: "mdi:code-json",
     category: Category.Dev,
   },
 ];

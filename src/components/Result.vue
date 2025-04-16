@@ -45,7 +45,7 @@ const handleCopy = async () => {
     <div class="relative">
       <component
         :is="is || 'p'"
-        class="font-mono px-3 py-2 outline outline-gray-200 break-all"
+        class="font-mono px-3 py-2 outline outline-gray-200 break-all overflow-auto"
         :class="[value ? '' : 'text-gray-400', bg || 'bg-gray-50']"
       >
         <slot>
