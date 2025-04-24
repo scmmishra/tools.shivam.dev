@@ -8,6 +8,7 @@ import Diff from "./pages/diff.vue";
 import WordCounter from "./pages/word-counter.vue";
 import SqlFormatter from "./pages/sql-formatter.vue";
 import JsonFormatter from "./pages/json-formatter.vue";
+import NotificationTester from "./pages/notification-tester.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -28,6 +29,7 @@ export enum Tools {
   WordCounter = "word-counter",
   SqlFormatter = "sql-formatter",
   JsonFormatter = "json-formatter",
+  NotificationTester = "notification-tester",
 }
 
 export const tools = [
@@ -114,6 +116,15 @@ export const tools = [
     description:
       "Format and prettify your JSON data instantly in your browser.",
     icon: "mdi:code-json",
+    category: Category.Dev,
+  },
+  {
+    slug: Tools.NotificationTester,
+    title: "Notification Tester",
+    component: NotificationTester,
+    description:
+      "Test browser notifications with permission handling and delayed notifications.",
+    icon: "carbon:notification",
     category: Category.Dev,
   },
 ];
