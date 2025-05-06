@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { picoSearch } from "@scmmishra/pico-search";
 
 const props = defineProps<{
   tools: Array<{
@@ -21,11 +22,10 @@ const selectedIndex = ref(0);
 
 const filteredTools = computed(() => {
   const query = searchQuery.value.toLowerCase();
-  return props.tools.filter(
-    (tool) =>
-      tool.name.toLowerCase().includes(query) ||
-      tool.description.toLowerCase().includes(query)
-  );
+  if (!query) {
+    return props.tools;
+  }
+  return picoSearch(props.tools, query, ["name", "description"]);
 });
 
 function close() {
