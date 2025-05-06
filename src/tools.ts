@@ -9,6 +9,7 @@ import WordCounter from "./pages/word-counter.vue";
 import SqlFormatter from "./pages/sql-formatter.vue";
 import JsonFormatter from "./pages/json-formatter.vue";
 import NotificationTester from "./pages/notification-tester.vue";
+import SecretSharing from "./pages/secret-sharing.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -30,6 +31,7 @@ export enum Tools {
   SqlFormatter = "sql-formatter",
   JsonFormatter = "json-formatter",
   NotificationTester = "notification-tester",
+  SecretSharing = "secret-sharing",
 }
 
 export const tools = [
@@ -126,5 +128,14 @@ export const tools = [
       "Test browser notifications with permission handling and delayed notifications.",
     icon: "carbon:notification",
     category: Category.Dev,
+  },
+  {
+    slug: Tools.SecretSharing,
+    title: "Secret Sharing",
+    component: SecretSharing,
+    description:
+      "Encrypt a secret with a password and share it via a URL. Decrypts in the browser.",
+    icon: "carbon:locked",
+    category: Category.Security,
   },
 ];

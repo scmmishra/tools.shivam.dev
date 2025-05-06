@@ -3,8 +3,10 @@ import Sidebar from "./components/Sidebar.vue";
 import NavBar from "./components/NavBar.vue";
 import CommandPalette from "./components/CommandPalette.vue";
 import { ref, onMounted, onUnmounted } from "vue";
+import { useRoute } from 'vue-router';
 import { tools } from "./tools";
 
+const route = useRoute();
 const commandPalette = ref<InstanceType<typeof CommandPalette> | null>(null);
 
 const navigationTools = tools.map((tool) => ({
@@ -31,17 +33,23 @@ onUnmounted(() => {
 
 <template>
   <div class="flex flex-wrap bg-gray-50">
-    <Sidebar class="hidden sm:grid" />
+    <Sidebar v-if="!route.meta.standalone" class="hidden sm:grid" />
     <main
-      class="basis-0 flex-grow-[999] min-h-screen p-3"
+      class="basis-0 flex-grow-[999] min-h-screen"
+      :class="{ 'p-3': !route.meta.standalone }"
       style="min-inline-size: 60%"
     >
-      <NavBar class="sm:hidden mb-2" />
-      <div class="bg-white outline outline-gray-200 h-full px-4 py-3">
+      <NavBar v-if="!route.meta.standalone" class="sm:hidden mb-2" />
+      <div
+         :class="{
+           'bg-white outline outline-gray-200 h-full px-4 py-3': !route.meta.standalone,
+           'h-full': route.meta.standalone
+         }"
+      >
         <RouterView />
       </div>
     </main>
 
-    <CommandPalette ref="commandPalette" :tools="navigationTools" />
+    <CommandPalette v-if="!route.meta.standalone" ref="commandPalette" :tools="navigationTools" />
   </div>
 </template>
