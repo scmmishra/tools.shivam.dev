@@ -25,7 +25,9 @@ const filteredTools = computed(() => {
   if (!query) {
     return props.tools;
   }
-  return picoSearch(props.tools, query, ["name", "description"]);
+  return picoSearch(props.tools, query, ["name", "description"], {
+    threshold: 0.8,
+  });
 });
 
 function close() {
