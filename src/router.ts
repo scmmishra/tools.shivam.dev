@@ -14,7 +14,7 @@ const router = createRouter({
   routes: [
     { path: "/", component: Index },
     {
-      path: "/decrypt/:payload",
+      path: "/decrypt/:payload?",
       component: Decrypt,
       meta: { standalone: true },
     },

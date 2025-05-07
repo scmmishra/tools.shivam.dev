@@ -165,8 +165,7 @@ async function encryptAndGenerateUrl() {
 
     // Generate URL using the new /decrypt route
     const currentOrigin = window.location.origin;
-    // Use '/decrypt/' path directly instead of manipulating hash
-    generatedUrl.value = `${currentOrigin}/decrypt/${payload}`;
+    generatedUrl.value = `${currentOrigin}/decrypt#${payload}`;
   } catch (error) {
     console.error("Encryption error:", error);
     errorMessage.value = "Encryption failed. Please try again.";

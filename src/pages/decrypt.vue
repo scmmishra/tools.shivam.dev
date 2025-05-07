@@ -138,19 +138,45 @@ function resetError() {
 }
 
 onMounted(() => {
-  const payload = route.params.payload;
-  if (payload && typeof payload === "string") {
-    // Basic format check
-    if (payload.includes(".") && payload.split(".").length === 3) {
-      encryptedPayloadFromUrl.value = payload;
-      console.log("Encrypted payload found in route parameter.");
-    } else {
-      errorMessage.value = "Invalid or missing secret data in the URL.";
-      console.error("Invalid payload format in route parameter:", payload);
-    }
+  let payloadFromUrl: string | null = null;
+  const hashPayload = window.location.hash.substring(1); // Remove leading #
+
+  if (
+    hashPayload &&
+    hashPayload.includes(".") &&
+    hashPayload.split(".").length === 3
+  ) {
+    payloadFromUrl = hashPayload;
+    console.log("Encrypted payload found in URL hash.");
   } else {
+    const routeParamPayload = route.params.payload;
+    if (routeParamPayload && typeof routeParamPayload === "string") {
+      if (
+        routeParamPayload.includes(".") &&
+        routeParamPayload.split(".").length === 3
+      ) {
+        payloadFromUrl = routeParamPayload;
+        console.log("Encrypted payload found in route parameter (fallback).");
+      } else {
+        errorMessage.value =
+          "Invalid secret data format in the URL (from route parameter).";
+        console.error(
+          "Invalid payload format in route parameter:",
+          routeParamPayload
+        );
+      }
+    } else if (hashPayload) {
+      errorMessage.value = "Invalid secret data format in the URL (from hash).";
+      console.error("Invalid payload format in URL hash:", hashPayload);
+    }
+  }
+
+  if (payloadFromUrl) {
+    encryptedPayloadFromUrl.value = payloadFromUrl;
+  } else if (!errorMessage.value) {
+    // Only set this if no specific error was already set
     errorMessage.value = "No secret data found in the URL.";
-    console.error("Missing or invalid payload route parameter:", payload);
+    console.error("Missing payload in both URL hash and route parameters.");
   }
 });
 </script>
