@@ -1,4 +1,4 @@
-import { VALIDATION_MESSAGES, SEVERITY } from "./constants";
+import { SEVERITY } from "./constants";
 import type {
   DnsRecord,
   DnsValidationContext,
@@ -128,7 +128,7 @@ export const validateSpfSyntax: ValidatorFunction = (record: DnsRecord) => {
 
 // Check for multiple SPF records
 export const validateMultipleSpf: ValidatorFunction = (
-  record: DnsRecord,
+  _record: DnsRecord,
   context: DnsValidationContext,
 ) => {
   const spfRecords = context.allRecords?.filter(

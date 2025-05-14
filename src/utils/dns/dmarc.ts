@@ -1,4 +1,4 @@
-import { VALIDATION_MESSAGES, SEVERITY } from "./constants";
+import { SEVERITY } from "./constants";
 import type {
   DnsRecord,
   DnsValidationContext,
@@ -51,10 +51,7 @@ function parseDmarcRecord(data: string): DmarcData | null {
 }
 
 // Check if domain has a DMARC record at _dmarc subdomain
-export const validateDmarcExists: ValidatorFunction = (
-  record: DnsRecord,
-  context: DnsValidationContext,
-) => {
+export const validateDmarcExists: ValidatorFunction = (record: DnsRecord) => {
   const dmarcRecords = record;
 
   if (!dmarcRecords) {
