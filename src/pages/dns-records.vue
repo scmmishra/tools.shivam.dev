@@ -8,6 +8,7 @@ import { validateCNAMERecord } from "../utils/dns/cname";
 import { validateMXRecord } from "../utils/dns/mx";
 import { validateSOARecord } from "../utils/dns/soa";
 import { validateSpfRecord } from "../utils/dns/spf";
+import { validateDmarcRecord } from "../utils/dns/dmarc";
 import type {
   ValidationWarning,
   DnsRecordType,
@@ -114,12 +115,42 @@ const validateTXTRecords = (
       };
     }
 
-    // Handle other TXT records
-    let warning;
-    if (record.data.length > 255) {
-      warning = "TXT record exceeds 255 characters";
+    // Handle DMARC records
+    if (record.data.startsWith("v=DMARC1")) {
+      const result = validateDmarcRecord(record, context);
+      const allWarnings = [...result.warnings, ...result.errors];
+      return {
+        ...record,
+        warnings: allWarnings,
+        warning: allWarnings[0]?.message,
+      };
     }
-    return { ...record, warning };
+
+    // Check for missing DMARC record
+    const dmarcRecords = context.allRecords?.filter(
+      r => r.type === "TXT" && r.data.startsWith("v=DMARC1")
+    );
+    if (!dmarcRecords?.length && !record.name.startsWith("_dmarc.")) {
+      const hasSpf = context.allRecords?.some(r => r.data.startsWith("v=spf1"));
+      if (hasSpf) {
+        record.warnings = [{
+          code: "missing_dmarc",
+          message: "Domain has SPF but no DMARC record - consider adding DMARC protection",
+          severity: "warning"
+        }];
+        record.warning = record.warnings[0].message;
+      }
+    }
+
+    // Handle other TXT records
+    if (!record.warnings) {
+      let warning;
+      if (record.data.length > 255) {
+        warning = "TXT record exceeds 255 characters";
+      }
+      return { ...record, warning };
+    }
+    return record;
   });
 };
 

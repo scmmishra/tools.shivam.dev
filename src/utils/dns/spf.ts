@@ -20,16 +20,46 @@ interface SpfData {
 }
 
 const COMMON_INCLUDES = [
-  "spf.protection.outlook.com",        // Microsoft 365
-  "_spf.google.com",                   // Google Workspace
-  "amazonses.com",                     // Amazon SES
-  "spf.mailjet.com",                   // Mailjet
-  "sendgrid.net",                      // SendGrid
-  "msgapp.com",                        // Campaign Monitor
-  "_spf.salesforce.com",               // Salesforce
-  "servers.mcsv.net",                  // Mailchimp
-  "spf.mandrillapp.com",              // Mandrill
-  "mail.zendesk.com",                 // Zendesk
+  "spf.protection.outlook.com", // Microsoft 365
+  "_spf.google.com", // Google Workspace
+  "amazonses.com", // Amazon SES
+  "spf.mailjet.com", // Mailjet
+  "sendgrid.net", // SendGrid
+  "msgapp.com", // Campaign Monitor
+  "_spf.salesforce.com", // Salesforce
+  "servers.mcsv.net", // Mailchimp
+  "spf.mandrillapp.com", // Mandrill
+  "mail.zendesk.com", // Zendesk
+  "postmarkapp.com", // Postmark
+  "sparkpostmail.com", // SparkPost
+  "mailgun.org", // Mailgun
+  "customeriomail.com", // Customer.io
+  "exacttarget.com", // Salesforce Marketing Cloud
+  "sendpulse.net", // SendPulse
+  "sendinblue.com", // Sendinblue
+  "freshdesk.com", // Freshdesk
+  "helpscout.net", // Help Scout
+  "intercom.io", // Intercom
+  "zoho.in", // Zoho
+  "outbound.sendowl.com", // SendOwl
+  "spf.constant.contact.com", // Constant Contact
+  "spf.hubspotemail.net", // HubSpot
+  "spf.smtp2go.com", // SMTP2GO
+  "spf.messagingengine.com", // Fastmail
+  "spf.moosend.com", // Moosend
+  "sp.frontapp.com", // Front
+  "spf.activecampaign.com", // ActiveCampaign
+  "mailsender.kayako.com", // Kayako
+  "spf.shopify.com", // Shopify
+  "spf.drift.com", // Drift
+  "spf.convertkit.com", // ConvertKit
+  "spf.klaviyo.com", // Klaviyo
+  "spf.drip.com", // Drip
+  "spf.returnpath.net", // Return Path
+  "_spf.protonmail.ch", // ProtonMail
+  "spf.socketlabs.com", // SocketLabs
+  "spf.mailerlite.com", // MailerLite
+  "spf.uservoice.com", // UserVoice
 ];
 
 function parseSpfRecord(data: string): SpfData | null {
@@ -58,7 +88,7 @@ function parseSpfRecord(data: string): SpfData | null {
 
     if (
       ["all", "ip4", "ip6", "a", "mx", "ptr", "exists", "include"].includes(
-        mechType
+        mechType,
       )
     ) {
       mechanisms.push({
@@ -79,17 +109,11 @@ function parseSpfRecord(data: string): SpfData | null {
 export const validateSpfSyntax: ValidatorFunction = (record: DnsRecord) => {
   const data = parseSpfRecord(record.data);
   if (!data) {
-    return utils.formatWarning(
-      "Invalid SPF record format",
-      SEVERITY.ERROR
-    );
+    return utils.formatWarning("Invalid SPF record format", SEVERITY.ERROR);
   }
 
   if (data.version !== "v=spf1") {
-    return utils.formatWarning(
-      "SPF version must be 'v=spf1'",
-      SEVERITY.ERROR
-    );
+    return utils.formatWarning("SPF version must be 'v=spf1'", SEVERITY.ERROR);
   }
 
   // Check if there's an "all" mechanism at the end
@@ -97,7 +121,7 @@ export const validateSpfSyntax: ValidatorFunction = (record: DnsRecord) => {
   if (!lastMech || lastMech.type !== "all") {
     return utils.formatWarning(
       "SPF record should end with an 'all' mechanism",
-      SEVERITY.WARNING
+      SEVERITY.WARNING,
     );
   }
 };
@@ -105,16 +129,16 @@ export const validateSpfSyntax: ValidatorFunction = (record: DnsRecord) => {
 // Check for multiple SPF records
 export const validateMultipleSpf: ValidatorFunction = (
   record: DnsRecord,
-  context: DnsValidationContext
+  context: DnsValidationContext,
 ) => {
   const spfRecords = context.allRecords?.filter(
-    (r) => r.type === "TXT" && r.data.startsWith("v=spf1")
+    (r) => r.type === "TXT" && r.data.startsWith("v=spf1"),
   );
 
   if (spfRecords && spfRecords.length > 1) {
     return utils.formatWarning(
       "Multiple SPF records found - this may cause issues with email delivery",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 };
@@ -129,7 +153,7 @@ export const validateIpMechanisms: ValidatorFunction = (record: DnsRecord) => {
       if (!utils.isValidCIDR(mech.value) && !utils.isValidIPv4(mech.value)) {
         return utils.formatWarning(
           `Invalid IPv4 address or CIDR in SPF record: ${mech.value}`,
-          SEVERITY.ERROR
+          SEVERITY.ERROR,
         );
       }
     }
@@ -137,7 +161,7 @@ export const validateIpMechanisms: ValidatorFunction = (record: DnsRecord) => {
       if (!utils.isValidCIDR(mech.value) && !utils.isValidIPv6(mech.value)) {
         return utils.formatWarning(
           `Invalid IPv6 address or CIDR in SPF record: ${mech.value}`,
-          SEVERITY.ERROR
+          SEVERITY.ERROR,
         );
       }
     }
@@ -145,7 +169,9 @@ export const validateIpMechanisms: ValidatorFunction = (record: DnsRecord) => {
 };
 
 // Check for recommended provider includes
-export const validateCommonIncludes: ValidatorFunction = (record: DnsRecord) => {
+export const validateCommonIncludes: ValidatorFunction = (
+  record: DnsRecord,
+) => {
   const data = parseSpfRecord(record.data);
   if (!data) return;
 
@@ -154,13 +180,13 @@ export const validateCommonIncludes: ValidatorFunction = (record: DnsRecord) => 
     .map((m) => m.value);
 
   const foundProviders = COMMON_INCLUDES.filter((provider) =>
-    includes.some((include) => include?.includes(provider))
+    includes.some((include) => include?.includes(provider)),
   );
 
   if (foundProviders.length === 0) {
     return utils.formatWarning(
       "No common email provider includes found in SPF record",
-      SEVERITY.INFO
+      SEVERITY.INFO,
     );
   }
 };
@@ -173,7 +199,7 @@ export const validatePtrUsage: ValidatorFunction = (record: DnsRecord) => {
   if (data.mechanisms.some((m) => m.type === "ptr")) {
     return utils.formatWarning(
       "PTR mechanism is deprecated and not recommended for use in SPF records",
-      SEVERITY.WARNING
+      SEVERITY.WARNING,
     );
   }
 };
@@ -203,14 +229,14 @@ export const validateLookupLimit: ValidatorFunction = (record: DnsRecord) => {
   if (lookupCount > 10) {
     return utils.formatWarning(
       `SPF record exceeds 10 DNS lookup limit (found ${lookupCount})`,
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 };
 
 export function validateSpfRecord(
   record: DnsRecord,
-  context: DnsValidationContext
+  context: DnsValidationContext,
 ): ValidationResult {
   const warnings: ValidationWarning[] = [];
   const errors: ValidationWarning[] = [];
