@@ -4,13 +4,24 @@ import TextInput from "../components/form/TextInput.vue";
 import ToolLayout from "../components/ToolLayout.vue";
 import { Tools } from "../tools";
 import { isIPV4Address, isIPV6Address } from "../utils/validate";
+import { validateCNAMERecord } from "../utils/dns/cname";
+import { validateMXRecord } from "../utils/dns/mx";
+import { validateSOARecord } from "../utils/dns/soa";
+import type { ValidationWarning, DnsRecordType } from "../utils/dns/types";
 
 interface DnsRecord {
-  type: string;
+  type: DnsRecordType;
   name: string;
   ttl: number;
   data: string;
   warning?: string;
+  warnings?: ValidationWarning[];
+}
+
+interface DnsValidationContext {
+  domain: string;
+  records: DnsRecord[];
+  allRecords?: DnsRecord[];
 }
 
 interface RecordSection {
@@ -64,22 +75,20 @@ const validateAAAARecords = (records: DnsRecord[]) => {
   }));
 };
 
-const validateMXRecords = (records: DnsRecord[]) => {
+const validateMXRecords = (
+  records: DnsRecord[],
+  context: DnsValidationContext,
+) => {
   if (records.length === 0) return records;
 
-  const priorities = new Set();
-
   return records.map((record) => {
-    const priority = parseInt(record.data.split(" ")[0]);
-    const hasDuplicate = priorities.has(priority);
-    priorities.add(priority);
-
-    let warning;
-    if (hasDuplicate) {
-      warning = "Duplicate MX priority";
-    }
-
-    return { ...record, warning };
+    const result = validateMXRecord(record, context);
+    const allWarnings = [...result.warnings, ...result.errors];
+    return {
+      ...record,
+      warnings: allWarnings,
+      warning: allWarnings[0]?.message,
+    };
   });
 };
 
@@ -108,19 +117,31 @@ const validateNSRecords = (records: DnsRecord[]) => {
 };
 
 const formattedRecords = computed((): DnsRecord[] => {
-  return dnsRecords.value.map((record) => ({
-    type:
-      Object.keys(recordTypes).find((k) => recordTypes[k].id === record.type) ||
-      `TYPE${record.type}`,
-    name: record.name,
-    ttl: record.TTL,
-    data: record.data,
-    warning: undefined,
-  }));
+  return dnsRecords.value
+    .map((record) => {
+      const recordType = Object.keys(recordTypes).find(
+        (k) => recordTypes[k].id === record.type,
+      );
+      // Skip records that don't match our supported types
+      if (!recordType) return null;
+      return {
+        type: recordType as DnsRecordType,
+        name: record.name,
+        ttl: record.TTL,
+        data: record.data,
+        warning: undefined,
+      };
+    })
+    .filter((r): r is DnsRecord => r !== null);
 });
 
 const sections = computed((): RecordSection[] => {
   const records = formattedRecords.value;
+  const context: DnsValidationContext = {
+    domain: domain.value,
+    records: records,
+    allRecords: records,
+  };
 
   return Object.entries(recordTypes)
     .map(([type, info]) => ({
@@ -134,7 +155,27 @@ const sections = computed((): RecordSection[] => {
           case "AAAA":
             return validateAAAARecords(typeRecords);
           case "MX":
-            return validateMXRecords(typeRecords);
+            return validateMXRecords(typeRecords, context);
+          case "CNAME":
+            return typeRecords.map((record) => {
+              const result = validateCNAMERecord(record, context);
+              const allWarnings = [...result.warnings, ...result.errors];
+              return {
+                ...record,
+                warnings: allWarnings,
+                warning: allWarnings[0]?.message,
+              };
+            });
+          case "SOA":
+            return typeRecords.map((record) => {
+              const result = validateSOARecord(record, context);
+              const allWarnings = [...result.warnings, ...result.errors];
+              return {
+                ...record,
+                warnings: allWarnings,
+                warning: allWarnings[0]?.message,
+              };
+            });
           case "TXT":
             return validateTXTRecords(typeRecords);
           case "NS":
@@ -271,8 +312,25 @@ const fetchDnsRecords = async () => {
                     >
                       {{ record.data }}
                     </div>
+                    <template
+                      v-if="record.warnings && record.warnings.length > 0"
+                    >
+                      <div
+                        v-for="(warning, idx) in record.warnings"
+                        :key="idx"
+                        class="mt-1 text-sm"
+                        :class="
+                          warning.severity === 'error'
+                            ? 'text-red-700'
+                            : 'text-yellow-700'
+                        "
+                      >
+                        {{ warning.severity === "error" ? "❌" : "⚠️" }}
+                        {{ warning.message }}
+                      </div>
+                    </template>
                     <div
-                      v-if="record.warning"
+                      v-else-if="record.warning"
                       class="mt-1 text-sm text-yellow-700"
                     >
                       ⚠️ {{ record.warning }}
