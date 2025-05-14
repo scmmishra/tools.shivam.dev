@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import TextInput from "../components/form/TextInput.vue";
 import ToolLayout from "../components/ToolLayout.vue";
 import { Tools } from "../tools";
+import { isIPV4Address, isIPV6Address } from "../utils/validate";
 
 interface DnsRecord {
   type: string;
@@ -48,7 +49,7 @@ const dnsRecords = ref<any[]>([]);
 const validateARecords = (records: DnsRecord[]) => {
   return records.map((record) => ({
     ...record,
-    warning: !record.data.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)
+    warning: !isIPV4Address(record.data)
       ? "Invalid IPv4 address format"
       : undefined,
   }));
@@ -57,7 +58,7 @@ const validateARecords = (records: DnsRecord[]) => {
 const validateAAAARecords = (records: DnsRecord[]) => {
   return records.map((record) => ({
     ...record,
-    warning: !record.data.match(/^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/)
+    warning: !isIPV6Address(record.data)
       ? "Invalid IPv6 address format"
       : undefined,
   }));
@@ -66,7 +67,6 @@ const validateAAAARecords = (records: DnsRecord[]) => {
 const validateMXRecords = (records: DnsRecord[]) => {
   if (records.length === 0) return records;
 
-  const hasPrimaryMX = records.some((r) => r.data.startsWith("0 "));
   const priorities = new Set();
 
   return records.map((record) => {
@@ -75,9 +75,7 @@ const validateMXRecords = (records: DnsRecord[]) => {
     priorities.add(priority);
 
     let warning;
-    if (!hasPrimaryMX && record === records[0]) {
-      warning = "No primary MX record (priority 0) found";
-    } else if (hasDuplicate) {
+    if (hasDuplicate) {
       warning = "Duplicate MX priority";
     }
 

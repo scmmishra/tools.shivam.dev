@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 
 import { Tools } from "../tools";
-import { calculateFleschReadingEase } from "../utils.js/readability";
+import { calculateFleschReadingEase } from "../utils/readability";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextArea from "../components/form/TextArea.vue";
 import Result from "../components/Result.vue";
