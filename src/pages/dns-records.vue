@@ -7,6 +7,7 @@ import { isIPV4Address, isIPV6Address } from "../utils/validate";
 import { validateCNAMERecord } from "../utils/dns/cname";
 import { validateMXRecord } from "../utils/dns/mx";
 import { validateSOARecord } from "../utils/dns/soa";
+import { validateSpfRecord } from "../utils/dns/spf";
 import type {
   ValidationWarning,
   DnsRecordType,
@@ -97,15 +98,26 @@ const validateMXRecords = (
   });
 };
 
-const validateTXTRecords = (records: DnsRecordWithWarnings[]) => {
-  const hasSpf = records.some((r) => r.data.startsWith("v=spf1"));
-
+const validateTXTRecords = (
+  records: DnsRecordWithWarnings[],
+  context: DnsValidationContext,
+) => {
   return records.map((record) => {
+    // Handle SPF records
+    if (record.data.startsWith("v=spf1")) {
+      const result = validateSpfRecord(record, context);
+      const allWarnings = [...result.warnings, ...result.errors];
+      return {
+        ...record,
+        warnings: allWarnings,
+        warning: allWarnings[0]?.message,
+      };
+    }
+
+    // Handle other TXT records
     let warning;
     if (record.data.length > 255) {
       warning = "TXT record exceeds 255 characters";
-    } else if (record.data.includes("spf1") && !hasSpf) {
-      warning = "SPF record found but no v=spf1 TXT record exists";
     }
     return { ...record, warning };
   });
@@ -182,7 +194,7 @@ const sections = computed((): RecordSection[] => {
               };
             });
           case "TXT":
-            return validateTXTRecords(typeRecords);
+            return validateTXTRecords(typeRecords, context);
           case "NS":
             return validateNSRecords(typeRecords);
           default:
