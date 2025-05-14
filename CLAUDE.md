@@ -34,6 +34,7 @@ This project is a collection of browser-based developer tools built with Vue 3, 
 
 4. **Data Persistence**
    - `usePersist` composable for saving form values to localStorage
+   - The components already use `usePersist` internally
    - Tools can specify which values to persist and offer clear functionality
 
 5. **Command Palette**
@@ -67,6 +68,7 @@ The project follows a consistent design language with these key characteristics:
 
 2. **Visual Style**
    - Minimal, clean interface with consistent spacing
+   - Use tailwind for styling, only in light mode
    - Gray color palette with subtle outlines instead of heavy borders
    - Consistent button styling with hover states
    - Sharp corners instead of rounded ones

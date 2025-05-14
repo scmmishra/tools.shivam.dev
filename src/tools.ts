@@ -10,6 +10,7 @@ import SqlFormatter from "./pages/sql-formatter.vue";
 import JsonFormatter from "./pages/json-formatter.vue";
 import NotificationTester from "./pages/notification-tester.vue";
 import SecretSharing from "./pages/secret-sharing.vue";
+import DnsRecords from "./pages/DnsRecords.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -32,6 +33,7 @@ export enum Tools {
   JsonFormatter = "json-formatter",
   NotificationTester = "notification-tester",
   SecretSharing = "secret-sharing",
+  DnsRecords = "dns-records",
 }
 
 export const tools = [
@@ -137,5 +139,14 @@ export const tools = [
       "Encrypt a secret with a password and share it via a URL. Decrypts in the browser.",
     icon: "carbon:locked",
     category: Category.Security,
+  },
+  {
+    slug: Tools.DnsRecords,
+    title: "DNS Records",
+    component: DnsRecords,
+    description:
+      "Look up DNS records for any domain using Google's public DNS service.",
+    icon: "carbon:dns-services",
+    category: Category.Dev,
   },
 ];
