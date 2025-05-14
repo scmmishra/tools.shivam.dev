@@ -246,6 +246,14 @@ const updateDomain = (value: string | undefined) => {
   domain.value = value ?? "";
 };
 
+const fetchDnsRecord = async (name: string, type: number) => {
+  const response = await fetch(
+    `https://dns.google/resolve?name=${encodeURIComponent(name)}&type=${type}`,
+  );
+  const data = await response.json();
+  return data.Answer || [];
+};
+
 const fetchDnsRecords = async () => {
   if (!domain.value) {
     error.value = "Please enter a domain";
@@ -257,17 +265,16 @@ const fetchDnsRecords = async () => {
   dnsRecords.value = [];
 
   try {
+    // Fetch all standard records
     const records = await Promise.all(
-      Object.values(recordTypes).map(async ({ id }) => {
-        const response = await fetch(
-          `https://dns.google/resolve?name=${encodeURIComponent(domain.value)}&type=${id}`,
-        );
-        const data = await response.json();
-        return data.Answer || [];
-      }),
+      Object.values(recordTypes).map(({ id }) =>
+        fetchDnsRecord(domain.value, id),
+      ),
     );
 
-    dnsRecords.value = records.flat();
+    const dmarcRecords = await fetchDnsRecord(`_dmarc.${domain.value}`, 16);
+
+    dnsRecords.value = [...records.flat(), ...dmarcRecords];
 
     if (dnsRecords.value.length === 0) {
       error.value = "No DNS records found";
