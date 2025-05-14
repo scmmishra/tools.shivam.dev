@@ -207,7 +207,7 @@ const fetchDnsRecords = async () => {
         />
 
         <button
-          class="mt-6 h-10 px-4 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          class="mt-6 h-10 px-4 text-sm font-medium text-gray-100 hover:bg-gray-800 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
           :disabled="loading || !domain"
           @click="fetchDnsRecords"
         >
@@ -215,7 +215,7 @@ const fetchDnsRecords = async () => {
         </button>
       </div>
 
-      <div v-if="error" class="p-4 text-sm text-red-600 bg-red-50 rounded">
+      <div v-if="error" class="p-4 text-sm text-red-600 bg-red-50">
         {{ error }}
       </div>
 
@@ -228,7 +228,7 @@ const fetchDnsRecords = async () => {
             <p class="mt-1 text-sm text-gray-500">{{ section.description }}</p>
           </div>
 
-          <div class="overflow-hidden shadow ring-1 ring-gray-200 rounded">
+          <div class="overflow-hidden shadow ring-1 ring-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
