@@ -1,170 +1,199 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import TextInput from '../components/form/TextInput.vue'
-import ToolLayout from '../components/ToolLayout.vue'
-import { Tools } from '../tools'
+import { ref, computed } from "vue";
+import TextInput from "../components/form/TextInput.vue";
+import ToolLayout from "../components/ToolLayout.vue";
+import { Tools } from "../tools";
 
 interface DnsRecord {
-  type: string
-  name: string
-  ttl: number
-  data: string
-  warning?: string
+  type: string;
+  name: string;
+  ttl: number;
+  data: string;
+  warning?: string;
 }
 
 interface RecordSection {
-  title: string
-  description: string
-  records: DnsRecord[]
+  title: string;
+  description: string;
+  records: DnsRecord[];
 }
 
 const recordTypes = {
-  A: { id: 1, description: 'Maps domain to IPv4 addresses' },
-  NS: { id: 2, description: 'Specifies authoritative nameservers' },
-  CNAME: { id: 5, description: 'Creates an alias pointing to another domain' },
-  SOA: { id: 6, description: 'Start of Authority - Contains domain administration info' },
-  MX: { id: 15, description: 'Specifies mail servers for the domain' },
-  TXT: { id: 16, description: 'Stores text information (SPF, DKIM, verification)' },
-  AAAA: { id: 28, description: 'Maps domain to IPv6 addresses' },
-  SRV: { id: 33, description: 'Service records for various protocols' },
-  CAA: { id: 257, description: 'Specifies which Certificate Authorities can issue SSL certificates' }
-}
+  A: { id: 1, description: "Maps domain to IPv4 addresses" },
+  NS: { id: 2, description: "Specifies authoritative nameservers" },
+  CNAME: { id: 5, description: "Creates an alias pointing to another domain" },
+  SOA: {
+    id: 6,
+    description: "Start of Authority - Contains domain administration info",
+  },
+  MX: { id: 15, description: "Specifies mail servers for the domain" },
+  TXT: {
+    id: 16,
+    description: "Stores text information (SPF, DKIM, verification)",
+  },
+  AAAA: { id: 28, description: "Maps domain to IPv6 addresses" },
+  SRV: { id: 33, description: "Service records for various protocols" },
+  CAA: {
+    id: 257,
+    description:
+      "Specifies which Certificate Authorities can issue SSL certificates",
+  },
+};
 
-const domain = ref('')
-const loading = ref(false)
-const error = ref('')
-const dnsRecords = ref<any[]>([])
+const domain = ref("");
+const loading = ref(false);
+const error = ref("");
+const dnsRecords = ref<any[]>([]);
 
 const validateARecords = (records: DnsRecord[]) => {
-  return records.map(record => ({
+  return records.map((record) => ({
     ...record,
-    warning: !record.data.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/) ? 'Invalid IPv4 address format' : undefined
-  }))
-}
+    warning: !record.data.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)
+      ? "Invalid IPv4 address format"
+      : undefined,
+  }));
+};
 
 const validateAAAARecords = (records: DnsRecord[]) => {
-  return records.map(record => ({
+  return records.map((record) => ({
     ...record,
-    warning: !record.data.match(/^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/) ? 'Invalid IPv6 address format' : undefined
-  }))
-}
+    warning: !record.data.match(/^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/)
+      ? "Invalid IPv6 address format"
+      : undefined,
+  }));
+};
 
 const validateMXRecords = (records: DnsRecord[]) => {
-  if (records.length === 0) return records
-  
-  const hasPrimaryMX = records.some(r => r.data.startsWith('0 '))
-  const priorities = new Set()
-  
-  return records.map(record => {
-    const priority = parseInt(record.data.split(' ')[0])
-    const hasDuplicate = priorities.has(priority)
-    priorities.add(priority)
-    
-    let warning
+  if (records.length === 0) return records;
+
+  const hasPrimaryMX = records.some((r) => r.data.startsWith("0 "));
+  const priorities = new Set();
+
+  return records.map((record) => {
+    const priority = parseInt(record.data.split(" ")[0]);
+    const hasDuplicate = priorities.has(priority);
+    priorities.add(priority);
+
+    let warning;
     if (!hasPrimaryMX && record === records[0]) {
-      warning = 'No primary MX record (priority 0) found'
+      warning = "No primary MX record (priority 0) found";
     } else if (hasDuplicate) {
-      warning = 'Duplicate MX priority'
+      warning = "Duplicate MX priority";
     }
-    
-    return { ...record, warning }
-  })
-}
+
+    return { ...record, warning };
+  });
+};
 
 const validateTXTRecords = (records: DnsRecord[]) => {
-  const hasSpf = records.some(r => r.data.startsWith('v=spf1'))
-  
-  return records.map(record => {
-    let warning
+  const hasSpf = records.some((r) => r.data.startsWith("v=spf1"));
+
+  return records.map((record) => {
+    let warning;
     if (record.data.length > 255) {
-      warning = 'TXT record exceeds 255 characters'
-    } else if (record.data.includes('spf1') && !hasSpf) {
-      warning = 'SPF record found but no v=spf1 TXT record exists'
+      warning = "TXT record exceeds 255 characters";
+    } else if (record.data.includes("spf1") && !hasSpf) {
+      warning = "SPF record found but no v=spf1 TXT record exists";
     }
-    return { ...record, warning }
-  })
-}
+    return { ...record, warning };
+  });
+};
 
 const validateNSRecords = (records: DnsRecord[]) => {
   return records.map((record, index) => ({
     ...record,
-    warning: records.length < 2 && index === 0 ? 'Less than 2 nameservers (recommended minimum is 2)' : undefined
-  }))
-}
+    warning:
+      records.length < 2 && index === 0
+        ? "Less than 2 nameservers (recommended minimum is 2)"
+        : undefined,
+  }));
+};
 
 const formattedRecords = computed((): DnsRecord[] => {
-  return dnsRecords.value.map(record => ({
-    type: Object.keys(recordTypes).find(k => recordTypes[k].id === record.type) || `TYPE${record.type}`,
+  return dnsRecords.value.map((record) => ({
+    type:
+      Object.keys(recordTypes).find((k) => recordTypes[k].id === record.type) ||
+      `TYPE${record.type}`,
     name: record.name,
     ttl: record.TTL,
     data: record.data,
-    warning: undefined
-  }))
-})
+    warning: undefined,
+  }));
+});
 
 const sections = computed((): RecordSection[] => {
-  const records = formattedRecords.value
-  
-  return Object.entries(recordTypes).map(([type, info]) => ({
-    title: `${type} Records`,
-    description: info.description,
-    records: (() => {
-      const typeRecords = records.filter(r => r.type === type)
-      switch (type) {
-        case 'A': return validateARecords(typeRecords)
-        case 'AAAA': return validateAAAARecords(typeRecords)
-        case 'MX': return validateMXRecords(typeRecords)
-        case 'TXT': return validateTXTRecords(typeRecords)
-        case 'NS': return validateNSRecords(typeRecords)
-        default: return typeRecords
-      }
-    })()
-  })).filter(section => section.records.length > 0)
-})
+  const records = formattedRecords.value;
+
+  return Object.entries(recordTypes)
+    .map(([type, info]) => ({
+      title: `${type} Records`,
+      description: info.description,
+      records: (() => {
+        const typeRecords = records.filter((r) => r.type === type);
+        switch (type) {
+          case "A":
+            return validateARecords(typeRecords);
+          case "AAAA":
+            return validateAAAARecords(typeRecords);
+          case "MX":
+            return validateMXRecords(typeRecords);
+          case "TXT":
+            return validateTXTRecords(typeRecords);
+          case "NS":
+            return validateNSRecords(typeRecords);
+          default:
+            return typeRecords;
+        }
+      })(),
+    }))
+    .filter((section) => section.records.length > 0);
+});
 
 const updateDomain = (value: string | undefined) => {
-  domain.value = value ?? ''
-}
+  domain.value = value ?? "";
+};
 
 const fetchDnsRecords = async () => {
   if (!domain.value) {
-    error.value = 'Please enter a domain'
-    return
+    error.value = "Please enter a domain";
+    return;
   }
 
-  loading.value = true
-  error.value = ''
-  dnsRecords.value = []
+  loading.value = true;
+  error.value = "";
+  dnsRecords.value = [];
 
   try {
     const records = await Promise.all(
       Object.values(recordTypes).map(async ({ id }) => {
         const response = await fetch(
-          `https://dns.google/resolve?name=${encodeURIComponent(domain.value)}&type=${id}`
-        )
-        const data = await response.json()
-        return data.Answer || []
-      })
-    )
+          `https://dns.google/resolve?name=${encodeURIComponent(domain.value)}&type=${id}`,
+        );
+        const data = await response.json();
+        return data.Answer || [];
+      }),
+    );
 
-    dnsRecords.value = records.flat()
+    dnsRecords.value = records.flat();
 
     if (dnsRecords.value.length === 0) {
-      error.value = 'No DNS records found'
+      error.value = "No DNS records found";
     }
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to fetch DNS records'
+    error.value =
+      e instanceof Error ? e.message : "Failed to fetch DNS records";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
 
 <template>
   <ToolLayout :name="Tools.DnsRecords" :persist-keys="['dns-domain']">
     <div class="space-y-6">
-      <div class="text-sm text-gray-500">
-        Records are queried using Google's Public DNS servers (8.8.8.8). Results may differ from your DNS provider.
+      <div class="text-gray-600">
+        Records are queried using Google's Public DNS servers (8.8.8.8). Results
+        may differ from your DNS provider.
       </div>
 
       <div class="flex gap-4">
@@ -184,7 +213,7 @@ const fetchDnsRecords = async () => {
           :disabled="loading || !domain"
           @click="fetchDnsRecords"
         >
-          {{ loading ? 'Loading...' : 'Lookup' }}
+          {{ loading ? "Loading..." : "Lookup" }}
         </button>
       </div>
 
@@ -195,7 +224,9 @@ const fetchDnsRecords = async () => {
       <template v-for="section in sections" :key="section.title">
         <div class="space-y-4">
           <div>
-            <h3 class="text-lg font-medium text-gray-900">{{ section.title }}</h3>
+            <h3 class="text-lg font-medium text-gray-900">
+              {{ section.title }}
+            </h3>
             <p class="mt-1 text-sm text-gray-500">{{ section.description }}</p>
           </div>
 
@@ -203,24 +234,49 @@ const fetchDnsRecords = async () => {
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Name</th>
-                  <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">TTL</th>
-                  <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Data</th>
+                  <th
+                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Name
+                  </th>
+                  <th
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    TTL
+                  </th>
+                  <th
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Data
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="record in section.records" :key="`${record.type}-${record.data}`" :class="{ 'bg-yellow-50': record.warning }">
-                  <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-mono text-gray-500">
+                <tr
+                  v-for="record in section.records"
+                  :key="`${record.type}-${record.data}`"
+                  :class="{ 'bg-yellow-50': record.warning }"
+                >
+                  <td
+                    class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-mono text-gray-500"
+                  >
                     {{ record.name }}
                   </td>
-                  <td class="whitespace-nowrap px-3 py-3 text-sm font-mono text-gray-500">
+                  <td
+                    class="whitespace-nowrap px-3 py-3 text-sm font-mono text-gray-500"
+                  >
                     {{ record.ttl }}
                   </td>
                   <td class="px-3 py-3">
-                    <div class="text-sm font-mono text-gray-500 whitespace-pre-wrap break-all">
+                    <div
+                      class="text-sm font-mono text-gray-500 whitespace-pre-wrap break-all"
+                    >
                       {{ record.data }}
                     </div>
-                    <div v-if="record.warning" class="mt-1 text-sm text-yellow-700">
+                    <div
+                      v-if="record.warning"
+                      class="mt-1 text-sm text-yellow-700"
+                    >
                       ⚠️ {{ record.warning }}
                     </div>
                   </td>
