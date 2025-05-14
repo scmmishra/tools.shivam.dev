@@ -18,6 +18,7 @@
     "@vueuse/core": "^13.1.0",
     "culori": "^4.0.1",
     "diff": "^7.0.0",
+    "ky": "^1.8.1",
     "shiki": "^3.2.1",
     "sql-formatter": "^15.5.2",
     "tailwindcss": "^4.1.3",
