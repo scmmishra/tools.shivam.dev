@@ -7,13 +7,14 @@ import { isIPV4Address, isIPV6Address } from "../utils/validate";
 import { validateCNAMERecord } from "../utils/dns/cname";
 import { validateMXRecord } from "../utils/dns/mx";
 import { validateSOARecord } from "../utils/dns/soa";
-import type { ValidationWarning, DnsRecordType } from "../utils/dns/types";
+import type {
+  ValidationWarning,
+  DnsRecordType,
+  DnsRecord,
+} from "../utils/dns/types";
 
-interface DnsRecord {
-  type: DnsRecordType;
-  name: string;
-  ttl: number;
-  data: string;
+// Use the DnsRecord type from types.ts but extend it with our UI-specific fields
+interface DnsRecordWithWarnings extends DnsRecord {
   warning?: string;
   warnings?: ValidationWarning[];
 }
@@ -27,37 +28,41 @@ interface DnsValidationContext {
 interface RecordSection {
   title: string;
   description: string;
-  records: DnsRecord[];
+  records: DnsRecordWithWarnings[];
 }
 
-const recordTypes = {
-  A: { id: 1, description: "Maps domain to IPv4 addresses" },
-  NS: { id: 2, description: "Specifies authoritative nameservers" },
-  CNAME: { id: 5, description: "Creates an alias pointing to another domain" },
-  SOA: {
-    id: 6,
-    description: "Start of Authority - Contains domain administration info",
-  },
-  MX: { id: 15, description: "Specifies mail servers for the domain" },
-  TXT: {
-    id: 16,
-    description: "Stores text information (SPF, DKIM, verification)",
-  },
-  AAAA: { id: 28, description: "Maps domain to IPv6 addresses" },
-  SRV: { id: 33, description: "Service records for various protocols" },
-  CAA: {
-    id: 257,
-    description:
-      "Specifies which Certificate Authorities can issue SSL certificates",
-  },
-};
+const recordTypes: Record<DnsRecordType, { id: number; description: string }> =
+  {
+    A: { id: 1, description: "Maps domain to IPv4 addresses" },
+    NS: { id: 2, description: "Specifies authoritative nameservers" },
+    CNAME: {
+      id: 5,
+      description: "Creates an alias pointing to another domain",
+    },
+    SOA: {
+      id: 6,
+      description: "Start of Authority - Contains domain administration info",
+    },
+    MX: { id: 15, description: "Specifies mail servers for the domain" },
+    TXT: {
+      id: 16,
+      description: "Stores text information (SPF, DKIM, verification)",
+    },
+    AAAA: { id: 28, description: "Maps domain to IPv6 addresses" },
+    SRV: { id: 33, description: "Service records for various protocols" },
+    CAA: {
+      id: 257,
+      description:
+        "Specifies which Certificate Authorities can issue SSL certificates",
+    },
+  };
 
 const domain = ref("");
 const loading = ref(false);
 const error = ref("");
 const dnsRecords = ref<any[]>([]);
 
-const validateARecords = (records: DnsRecord[]) => {
+const validateARecords = (records: DnsRecordWithWarnings[]) => {
   return records.map((record) => ({
     ...record,
     warning: !isIPV4Address(record.data)
@@ -66,7 +71,7 @@ const validateARecords = (records: DnsRecord[]) => {
   }));
 };
 
-const validateAAAARecords = (records: DnsRecord[]) => {
+const validateAAAARecords = (records: DnsRecordWithWarnings[]) => {
   return records.map((record) => ({
     ...record,
     warning: !isIPV6Address(record.data)
@@ -76,7 +81,7 @@ const validateAAAARecords = (records: DnsRecord[]) => {
 };
 
 const validateMXRecords = (
-  records: DnsRecord[],
+  records: DnsRecordWithWarnings[],
   context: DnsValidationContext,
 ) => {
   if (records.length === 0) return records;
@@ -92,7 +97,7 @@ const validateMXRecords = (
   });
 };
 
-const validateTXTRecords = (records: DnsRecord[]) => {
+const validateTXTRecords = (records: DnsRecordWithWarnings[]) => {
   const hasSpf = records.some((r) => r.data.startsWith("v=spf1"));
 
   return records.map((record) => {
@@ -106,7 +111,7 @@ const validateTXTRecords = (records: DnsRecord[]) => {
   });
 };
 
-const validateNSRecords = (records: DnsRecord[]) => {
+const validateNSRecords = (records: DnsRecordWithWarnings[]) => {
   return records.map((record, index) => ({
     ...record,
     warning:
@@ -116,23 +121,23 @@ const validateNSRecords = (records: DnsRecord[]) => {
   }));
 };
 
-const formattedRecords = computed((): DnsRecord[] => {
+const formattedRecords = computed((): DnsRecordWithWarnings[] => {
   return dnsRecords.value
-    .map((record) => {
-      const recordType = Object.keys(recordTypes).find(
+    .map((record): DnsRecordWithWarnings | null => {
+      const recordType = (Object.keys(recordTypes) as DnsRecordType[]).find(
         (k) => recordTypes[k].id === record.type,
       );
       // Skip records that don't match our supported types
       if (!recordType) return null;
       return {
-        type: recordType as DnsRecordType,
+        type: recordType,
         name: record.name,
         ttl: record.TTL,
         data: record.data,
         warning: undefined,
-      };
+      } as DnsRecordWithWarnings;
     })
-    .filter((r): r is DnsRecord => r !== null);
+    .filter((r): r is NonNullable<typeof r> => r !== null);
 });
 
 const sections = computed((): RecordSection[] => {
