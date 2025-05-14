@@ -104,6 +104,7 @@ const validateTXTRecords = (
   context: DnsValidationContext,
 ) => {
   return records.map((record) => {
+    console.log(record);
     // Handle SPF records
     if (record.data.startsWith("v=spf1")) {
       const result = validateSpfRecord(record, context);
@@ -128,16 +129,21 @@ const validateTXTRecords = (
 
     // Check for missing DMARC record
     const dmarcRecords = context.allRecords?.filter(
-      r => r.type === "TXT" && r.data.startsWith("v=DMARC1")
+      (r) => r.type === "TXT" && r.data.startsWith("v=DMARC1"),
     );
     if (!dmarcRecords?.length && !record.name.startsWith("_dmarc.")) {
-      const hasSpf = context.allRecords?.some(r => r.data.startsWith("v=spf1"));
+      const hasSpf = context.allRecords?.some((r) =>
+        r.data.startsWith("v=spf1"),
+      );
       if (hasSpf) {
-        record.warnings = [{
-          code: "missing_dmarc",
-          message: "Domain has SPF but no DMARC record - consider adding DMARC protection",
-          severity: "warning"
-        }];
+        record.warnings = [
+          {
+            code: "missing_dmarc",
+            message:
+              "Domain has SPF but no DMARC record - consider adding DMARC protection",
+            severity: "warning",
+          },
+        ];
         record.warning = record.warnings[0].message;
       }
     }
