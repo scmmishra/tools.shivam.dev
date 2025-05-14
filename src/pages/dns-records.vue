@@ -4,11 +4,6 @@ import TextInput from '../components/form/TextInput.vue'
 import ToolLayout from '../components/ToolLayout.vue'
 import { Tools } from '../tools'
 
-const domain = ref('')
-const loading = ref(false)
-const error = ref('')
-const dnsRecords = ref<any[]>([])
-
 interface DnsRecord {
   type: string
   name: string
@@ -21,139 +16,110 @@ interface RecordSection {
   title: string
   description: string
   records: DnsRecord[]
-  validate?: (records: DnsRecord[]) => void
 }
 
-const types: Record<number, string> = {
-  1: 'A',
-  2: 'NS',
-  5: 'CNAME',
-  6: 'SOA',
-  15: 'MX',
-  16: 'TXT',
-  28: 'AAAA',
-  33: 'SRV',
-  257: 'CAA'
+const recordTypes = {
+  A: { id: 1, description: 'Maps domain to IPv4 addresses' },
+  NS: { id: 2, description: 'Specifies authoritative nameservers' },
+  CNAME: { id: 5, description: 'Creates an alias pointing to another domain' },
+  SOA: { id: 6, description: 'Start of Authority - Contains domain administration info' },
+  MX: { id: 15, description: 'Specifies mail servers for the domain' },
+  TXT: { id: 16, description: 'Stores text information (SPF, DKIM, verification)' },
+  AAAA: { id: 28, description: 'Maps domain to IPv6 addresses' },
+  SRV: { id: 33, description: 'Service records for various protocols' },
+  CAA: { id: 257, description: 'Specifies which Certificate Authorities can issue SSL certificates' }
 }
+
+const domain = ref('')
+const loading = ref(false)
+const error = ref('')
+const dnsRecords = ref<any[]>([])
 
 const validateARecords = (records: DnsRecord[]) => {
-  records.forEach(record => {
-    if (!record.data.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)) {
-      record.warning = 'Invalid IPv4 address format'
-    }
-  })
+  return records.map(record => ({
+    ...record,
+    warning: !record.data.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/) ? 'Invalid IPv4 address format' : undefined
+  }))
 }
 
 const validateAAAARecords = (records: DnsRecord[]) => {
-  records.forEach(record => {
-    if (!record.data.match(/^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/)) {
-      record.warning = 'Invalid IPv6 address format'
-    }
-  })
+  return records.map(record => ({
+    ...record,
+    warning: !record.data.match(/^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/) ? 'Invalid IPv6 address format' : undefined
+  }))
 }
 
 const validateMXRecords = (records: DnsRecord[]) => {
-  if (records.length === 0) {
-    return
-  }
+  if (records.length === 0) return records
   
-  // Check if there's a primary MX record with lowest priority
   const hasPrimaryMX = records.some(r => r.data.startsWith('0 '))
-  if (!hasPrimaryMX) {
-    records[0].warning = 'No primary MX record (priority 0) found'
-  }
-
-  // Check for duplicate priorities
   const priorities = new Set()
-  records.forEach(record => {
+  
+  return records.map(record => {
     const priority = parseInt(record.data.split(' ')[0])
-    if (priorities.has(priority)) {
-      record.warning = 'Duplicate MX priority'
-    }
+    const hasDuplicate = priorities.has(priority)
     priorities.add(priority)
+    
+    let warning
+    if (!hasPrimaryMX && record === records[0]) {
+      warning = 'No primary MX record (priority 0) found'
+    } else if (hasDuplicate) {
+      warning = 'Duplicate MX priority'
+    }
+    
+    return { ...record, warning }
   })
 }
 
 const validateTXTRecords = (records: DnsRecord[]) => {
-  records.forEach(record => {
+  const hasSpf = records.some(r => r.data.startsWith('v=spf1'))
+  
+  return records.map(record => {
+    let warning
     if (record.data.length > 255) {
-      record.warning = 'TXT record exceeds 255 characters'
+      warning = 'TXT record exceeds 255 characters'
+    } else if (record.data.includes('spf1') && !hasSpf) {
+      warning = 'SPF record found but no v=spf1 TXT record exists'
     }
-    if (record.data.includes('spf1')) {
-      const spfRecord = records.find(r => r.data.startsWith('v=spf1'))
-      if (!spfRecord) {
-        record.warning = 'SPF record found but no v=spf1 TXT record exists'
-      }
-    }
+    return { ...record, warning }
   })
 }
 
 const validateNSRecords = (records: DnsRecord[]) => {
-  if (records.length < 2) {
-    records[0].warning = 'Less than 2 nameservers (recommended minimum is 2)'
-  }
+  return records.map((record, index) => ({
+    ...record,
+    warning: records.length < 2 && index === 0 ? 'Less than 2 nameservers (recommended minimum is 2)' : undefined
+  }))
 }
 
-const sections = computed((): RecordSection[] => [
-  {
-    title: 'A Records',
-    description: 'Maps domain to IPv4 addresses',
-    records: formattedRecords.value.filter(r => r.type === 'A'),
-    validate: validateARecords
-  },
-  {
-    title: 'AAAA Records',
-    description: 'Maps domain to IPv6 addresses',
-    records: formattedRecords.value.filter(r => r.type === 'AAAA'),
-    validate: validateAAAARecords
-  },
-  {
-    title: 'CNAME Records',
-    description: 'Creates an alias pointing to another domain',
-    records: formattedRecords.value.filter(r => r.type === 'CNAME')
-  },
-  {
-    title: 'MX Records',
-    description: 'Specifies mail servers for the domain',
-    records: formattedRecords.value.filter(r => r.type === 'MX'),
-    validate: validateMXRecords
-  },
-  {
-    title: 'TXT Records',
-    description: 'Stores text information (SPF, DKIM, verification)',
-    records: formattedRecords.value.filter(r => r.type === 'TXT'),
-    validate: validateTXTRecords
-  },
-  {
-    title: 'NS Records',
-    description: 'Specifies authoritative nameservers',
-    records: formattedRecords.value.filter(r => r.type === 'NS'),
-    validate: validateNSRecords
-  },
-  {
-    title: 'SOA Record',
-    description: 'Start of Authority - Contains domain administration info',
-    records: formattedRecords.value.filter(r => r.type === 'SOA')
-  },
-  {
-    title: 'CAA Records',
-    description: 'Specifies which Certificate Authorities can issue SSL certificates',
-    records: formattedRecords.value.filter(r => r.type === 'CAA')
-  },
-  {
-    title: 'Other Records',
-    description: 'Additional DNS records',
-    records: formattedRecords.value.filter(r => !['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SOA', 'CAA'].includes(r.type))
-  }
-])
-
-const formattedRecords = computed(() => {
+const formattedRecords = computed((): DnsRecord[] => {
   return dnsRecords.value.map(record => ({
-    type: types[record.type] || `TYPE${record.type}`,
+    type: Object.keys(recordTypes).find(k => recordTypes[k].id === record.type) || `TYPE${record.type}`,
     name: record.name,
     ttl: record.TTL,
-    data: record.data
+    data: record.data,
+    warning: undefined
   }))
+})
+
+const sections = computed((): RecordSection[] => {
+  const records = formattedRecords.value
+  
+  return Object.entries(recordTypes).map(([type, info]) => ({
+    title: `${type} Records`,
+    description: info.description,
+    records: (() => {
+      const typeRecords = records.filter(r => r.type === type)
+      switch (type) {
+        case 'A': return validateARecords(typeRecords)
+        case 'AAAA': return validateAAAARecords(typeRecords)
+        case 'MX': return validateMXRecords(typeRecords)
+        case 'TXT': return validateTXTRecords(typeRecords)
+        case 'NS': return validateNSRecords(typeRecords)
+        default: return typeRecords
+      }
+    })()
+  })).filter(section => section.records.length > 0)
 })
 
 const updateDomain = (value: string | undefined) => {
@@ -171,26 +137,21 @@ const fetchDnsRecords = async () => {
   dnsRecords.value = []
 
   try {
-    const response = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain.value)}&type=ANY`)
-    const data = await response.json()
+    const records = await Promise.all(
+      Object.values(recordTypes).map(async ({ id }) => {
+        const response = await fetch(
+          `https://dns.google/resolve?name=${encodeURIComponent(domain.value)}&type=${id}`
+        )
+        const data = await response.json()
+        return data.Answer || []
+      })
+    )
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch DNS records')
-    }
+    dnsRecords.value = records.flat()
 
-    if (!data.Answer) {
+    if (dnsRecords.value.length === 0) {
       error.value = 'No DNS records found'
-      return
     }
-
-    dnsRecords.value = data.Answer
-
-    // Run validation for each section
-    sections.value.forEach(section => {
-      if (section.validate) {
-        section.validate(section.records)
-      }
-    })
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to fetch DNS records'
   } finally {
@@ -202,6 +163,10 @@ const fetchDnsRecords = async () => {
 <template>
   <ToolLayout :name="Tools.DnsRecords" :persist-keys="['dns-domain']">
     <div class="space-y-6">
+      <div class="text-sm text-gray-500">
+        Records are queried using Google's Public DNS servers (8.8.8.8). Results may differ from your DNS provider.
+      </div>
+
       <div class="flex gap-4">
         <TextInput
           id="dns-domain"
@@ -228,7 +193,7 @@ const fetchDnsRecords = async () => {
       </div>
 
       <template v-for="section in sections" :key="section.title">
-        <div v-if="section.records.length" class="space-y-4">
+        <div class="space-y-4">
           <div>
             <h3 class="text-lg font-medium text-gray-900">{{ section.title }}</h3>
             <p class="mt-1 text-sm text-gray-500">{{ section.description }}</p>

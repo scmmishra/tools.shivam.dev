@@ -86,7 +86,7 @@ When creating new components or modifying existing ones, strictly adhere to thes
 
 To add a new tool to the application:
 
-1. Create a new Vue component in `src/pages/`
+1. Create a new Vue component in `src/pages/`, use kebab case for naming the file
 2. Import and register it in `src/tools.ts`
 3. Add it to the appropriate category
 4. Define metadata (title, description, icon, etc.)
