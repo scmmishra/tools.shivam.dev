@@ -10,7 +10,7 @@ import SqlFormatter from "./pages/sql-formatter.vue";
 import JsonFormatter from "./pages/json-formatter.vue";
 import NotificationTester from "./pages/notification-tester.vue";
 import SecretSharing from "./pages/secret-sharing.vue";
-import DnsRecords from "./pages/DnsRecords.vue";
+import DnsRecords from "./pages/dns-records.vue";
 
 export enum Category {
   Encoding = "encoding",
