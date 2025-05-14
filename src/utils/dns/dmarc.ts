@@ -24,13 +24,16 @@ interface DmarcData {
 
 function parseDmarcRecord(data: string): DmarcData | null {
   const tags = utils.parseDNSKeyValue(data);
-  if (!tags.v || tags.v !== "DMARC1") return null;
+  if (!tags.v || tags.v !== "DMARC1") {
+    console.log("RETRUNING NULL", tags);
+    return null;
+  }
 
   // Convert RUA/RUF comma-separated lists to arrays
-  const rua = tags.rua?.split(",").map(uri => uri.trim());
-  const ruf = tags.ruf?.split(",").map(uri => uri.trim());
-  const fo = tags.fo?.split(":").map(opt => opt.trim());
-  const rf = tags.rf?.split(":").map(type => type.trim());
+  const rua = tags.rua?.split(",").map((uri) => uri.trim());
+  const ruf = tags.ruf?.split(",").map((uri) => uri.trim());
+  const fo = tags.fo?.split(":").map((opt) => opt.trim());
+  const rf = tags.rf?.split(":").map((type) => type.trim());
 
   return {
     version: tags.v,
@@ -50,49 +53,38 @@ function parseDmarcRecord(data: string): DmarcData | null {
 // Check if domain has a DMARC record at _dmarc subdomain
 export const validateDmarcExists: ValidatorFunction = (
   record: DnsRecord,
-  context: DnsValidationContext
+  context: DnsValidationContext,
 ) => {
-  const dmarcDomain = `_dmarc.${context.domain}`;
-  const dmarcRecords = context.allRecords?.filter(
-    r => r.type === "TXT" && r.name === dmarcDomain && r.data.startsWith("v=DMARC1")
-  );
+  const dmarcRecords = record;
 
-  if (!dmarcRecords || dmarcRecords.length === 0) {
+  if (!dmarcRecords) {
     return utils.formatWarning(
       "No DMARC record found at _dmarc subdomain",
-      SEVERITY.ERROR
-    );
-  }
-
-  if (dmarcRecords.length > 1) {
-    return utils.formatWarning(
-      "Multiple DMARC records found - only one is allowed",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 };
 
 // Validate DMARC record structure
-export const validateDmarcStructure: ValidatorFunction = (record: DnsRecord) => {
+export const validateDmarcStructure: ValidatorFunction = (
+  record: DnsRecord,
+) => {
   const data = parseDmarcRecord(record.data);
   if (!data) {
-    return utils.formatWarning(
-      "Invalid DMARC record format",
-      SEVERITY.ERROR
-    );
+    return utils.formatWarning("Invalid DMARC record format", SEVERITY.ERROR);
   }
 
   if (!data.policy) {
     return utils.formatWarning(
       "Missing required policy (p) tag",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 
   if (!["none", "quarantine", "reject"].includes(data.policy)) {
     return utils.formatWarning(
       "Invalid policy value - must be 'none', 'quarantine', or 'reject'",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 };
@@ -105,21 +97,21 @@ export const validateAlignment: ValidatorFunction = (record: DnsRecord) => {
   if (data.aspf && !["r", "s"].includes(data.aspf)) {
     return utils.formatWarning(
       "Invalid SPF alignment mode - must be 'r' (relaxed) or 's' (strict)",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 
   if (data.adkim && !["r", "s"].includes(data.adkim)) {
     return utils.formatWarning(
       "Invalid DKIM alignment mode - must be 'r' (relaxed) or 's' (strict)",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 
   if (data.aspf === "s" || data.adkim === "s") {
     return utils.formatWarning(
       "Strict alignment mode may cause legitimate emails to fail",
-      SEVERITY.WARNING
+      SEVERITY.WARNING,
     );
   }
 };
@@ -134,16 +126,19 @@ export const validateReportingURIs: ValidatorFunction = (record: DnsRecord) => {
     if (data.rua.length > 2) {
       return utils.formatWarning(
         "Too many aggregate report URIs (maximum 2 recommended)",
-        SEVERITY.WARNING
+        SEVERITY.WARNING,
       );
     }
 
     for (const uri of data.rua) {
       const parsedUri = utils.parseURI(uri);
-      if (!parsedUri || (parsedUri.scheme !== "mailto" && parsedUri.scheme !== "https")) {
+      if (
+        !parsedUri ||
+        (parsedUri.scheme !== "mailto" && parsedUri.scheme !== "https")
+      ) {
         return utils.formatWarning(
           `Invalid aggregate report URI format: ${uri}`,
-          SEVERITY.ERROR
+          SEVERITY.ERROR,
         );
       }
     }
@@ -156,7 +151,7 @@ export const validateReportingURIs: ValidatorFunction = (record: DnsRecord) => {
       if (!parsedUri || parsedUri.scheme !== "mailto") {
         return utils.formatWarning(
           `Forensic report URI must use mailto scheme: ${uri}`,
-          SEVERITY.ERROR
+          SEVERITY.ERROR,
         );
       }
     }
@@ -166,13 +161,15 @@ export const validateReportingURIs: ValidatorFunction = (record: DnsRecord) => {
   if (!data.rua || !data.ruf) {
     return utils.formatWarning(
       "Consider enabling both aggregate (rua) and forensic (ruf) reporting",
-      SEVERITY.INFO
+      SEVERITY.INFO,
     );
   }
 };
 
 // Validate policy settings
-export const validatePolicySettings: ValidatorFunction = (record: DnsRecord) => {
+export const validatePolicySettings: ValidatorFunction = (
+  record: DnsRecord,
+) => {
   const data = parseDmarcRecord(record.data);
   if (!data) return;
 
@@ -181,22 +178,25 @@ export const validatePolicySettings: ValidatorFunction = (record: DnsRecord) => 
     if (data.pct < 0 || data.pct > 100) {
       return utils.formatWarning(
         "Invalid percentage - must be between 0 and 100",
-        SEVERITY.ERROR
+        SEVERITY.ERROR,
       );
     }
     if (data.pct < 100) {
       return utils.formatWarning(
         `Only ${data.pct}% of messages are subject to filtering`,
-        SEVERITY.WARNING
+        SEVERITY.WARNING,
       );
     }
   }
 
   // Check subdomain policy
-  if (data.subdomainPolicy && !["none", "quarantine", "reject"].includes(data.subdomainPolicy)) {
+  if (
+    data.subdomainPolicy &&
+    !["none", "quarantine", "reject"].includes(data.subdomainPolicy)
+  ) {
     return utils.formatWarning(
       "Invalid subdomain policy - must be 'none', 'quarantine', or 'reject'",
-      SEVERITY.ERROR
+      SEVERITY.ERROR,
     );
   }
 
@@ -205,7 +205,7 @@ export const validatePolicySettings: ValidatorFunction = (record: DnsRecord) => 
     if (data.ri < 3600 || data.ri > 86400) {
       return utils.formatWarning(
         "Report interval should be between 1 hour and 24 hours",
-        SEVERITY.WARNING
+        SEVERITY.WARNING,
       );
     }
   }
@@ -214,14 +214,14 @@ export const validatePolicySettings: ValidatorFunction = (record: DnsRecord) => 
   if (data.policy === "none") {
     return utils.formatWarning(
       "Consider moving to a stricter policy ('quarantine' or 'reject') once email authentication is stable",
-      SEVERITY.INFO
+      SEVERITY.INFO,
     );
   }
 };
 
 export function validateDmarcRecord(
   record: DnsRecord,
-  context: DnsValidationContext
+  context: DnsValidationContext,
 ): ValidationResult {
   const warnings: ValidationWarning[] = [];
   const errors: ValidationWarning[] = [];

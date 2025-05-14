@@ -1,6 +1,6 @@
-import { SEVERITY } from './constants';
-import type { ValidationWarning, Severity } from './types';
-import { isIPV4Address, isIPV6Address } from '../validate';
+import { SEVERITY } from "./constants";
+import type { ValidationWarning, Severity } from "./types";
+import { isIPV4Address, isIPV6Address } from "../validate";
 
 export interface URIComponents {
   scheme: string;
@@ -21,7 +21,9 @@ export const utils = {
       const url = new URL(uri);
       return {
         scheme: url.protocol.slice(0, -1),
-        userinfo: url.username ? `${url.username}${url.password ? ':' + url.password : ''}` : undefined,
+        userinfo: url.username
+          ? `${url.username}${url.password ? ":" + url.password : ""}`
+          : undefined,
         host: url.hostname,
         port: url.port || undefined,
         path: url.pathname || undefined,
@@ -37,7 +39,8 @@ export const utils = {
    * Validate a domain name
    */
   isValidDomain(domain: string): boolean {
-    const pattern = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+    const pattern =
+      /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
     return pattern.test(domain);
   },
 
@@ -60,16 +63,20 @@ export const utils = {
    */
   isValidEmail(email: string): boolean {
     // Basic email validation - for more comprehensive validation consider using a library
-    const pattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const pattern =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     return pattern.test(email);
   },
 
   /**
    * Format a validation warning with severity
    */
-  formatWarning(message: string, severity: Severity = SEVERITY.WARNING): ValidationWarning {
+  formatWarning(
+    message: string,
+    severity: Severity = SEVERITY.WARNING,
+  ): ValidationWarning {
     return {
-      code: message.toLowerCase().replace(/\s+/g, '_'),
+      code: message.toLowerCase().replace(/\s+/g, "_"),
       message,
       severity,
     };
@@ -79,7 +86,7 @@ export const utils = {
    * Normalize a domain name by removing trailing dot and converting to lowercase
    */
   normalizeDomain(domain: string): string {
-    return domain.replace(/\.$/, '').toLowerCase();
+    return domain.replace(/\.$/, "").toLowerCase();
   },
 
   /**
@@ -87,12 +94,12 @@ export const utils = {
    */
   parseDNSKeyValue(record: string): Record<string, string> {
     const result: Record<string, string> = {};
-    const parts = record.split(' ');
+    const parts = record.split(";");
 
     for (const part of parts) {
-      const [key, value] = part.split('=');
+      const [key, value] = part.trim().split("=");
       if (key && value) {
-        result[key.toLowerCase()] = value;
+        result[key.trim().toLowerCase()] = value.trim();
       }
     }
 
@@ -112,16 +119,16 @@ export const utils = {
    */
   formatTTL(ttl: number): string {
     const units: [number, string][] = [
-      [86400, 'day'],
-      [3600, 'hour'],
-      [60, 'minute'],
-      [1, 'second']
+      [86400, "day"],
+      [3600, "hour"],
+      [60, "minute"],
+      [1, "second"],
     ];
 
     for (const [value, unit] of units) {
       if (ttl >= value) {
         const amount = Math.floor(ttl / value);
-        return `${amount} ${unit}${amount !== 1 ? 's' : ''}`;
+        return `${amount} ${unit}${amount !== 1 ? "s" : ""}`;
       }
     }
 
@@ -132,14 +139,14 @@ export const utils = {
    * Check if a hostname is a wildcard
    */
   isWildcard(hostname: string): boolean {
-    return hostname.startsWith('*.');
+    return hostname.startsWith("*.");
   },
 
   /**
    * Validate CIDR notation
    */
   isValidCIDR(cidr: string): boolean {
-    const [ip, prefix] = cidr.split('/');
+    const [ip, prefix] = cidr.split("/");
     if (!prefix) return false;
 
     const prefixNum = parseInt(prefix, 10);

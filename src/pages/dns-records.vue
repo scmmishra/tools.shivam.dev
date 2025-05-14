@@ -127,30 +127,9 @@ const validateTXTRecords = (
       };
     }
 
-    // Check for missing DMARC record
-    const dmarcRecords = context.allRecords?.filter(
-      (r) => r.type === "TXT" && r.data.startsWith("v=DMARC1"),
-    );
-    if (!dmarcRecords?.length && !record.name.startsWith("_dmarc.")) {
-      const hasSpf = context.allRecords?.some((r) =>
-        r.data.startsWith("v=spf1"),
-      );
-      if (hasSpf) {
-        record.warnings = [
-          {
-            code: "missing_dmarc",
-            message:
-              "Domain has SPF but no DMARC record - consider adding DMARC protection",
-            severity: "warning",
-          },
-        ];
-        record.warning = record.warnings[0].message;
-      }
-    }
-
     // Handle other TXT records
+    let warning;
     if (!record.warnings) {
-      let warning;
       if (record.data.length > 255) {
         warning = "TXT record exceeds 255 characters";
       }
@@ -265,16 +244,15 @@ const fetchDnsRecords = async () => {
   dnsRecords.value = [];
 
   try {
-    // Fetch all standard records
-    const records = await Promise.all(
-      Object.values(recordTypes).map(({ id }) =>
+    // Fetch all standard records plus DMARC
+    const records = await Promise.all([
+      ...Object.values(recordTypes).map(({ id }) =>
         fetchDnsRecord(domain.value, id),
       ),
-    );
+      fetchDnsRecord(`_dmarc.${domain.value}`, 16), // DMARC record
+    ]);
 
-    const dmarcRecords = await fetchDnsRecord(`_dmarc.${domain.value}`, 16);
-
-    dnsRecords.value = [...records.flat(), ...dmarcRecords];
+    dnsRecords.value = records.flat();
 
     if (dnsRecords.value.length === 0) {
       error.value = "No DNS records found";
