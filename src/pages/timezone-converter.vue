@@ -96,18 +96,6 @@ function parseDateTime(input: string, sourceTimezone: string): Date | null {
     const dateStr = dateMatch[1];
     const timeStr = dateMatch[2] || '00:00:00';
 
-    // Create a date string that the Intl API can work with
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: sourceTimezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-
     // Parse the date components
     const [year, month, day] = dateStr.split('-').map(Number);
     const [hour, minute, second] = timeStr.split(':').map(Number);
