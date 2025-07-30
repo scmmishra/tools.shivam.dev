@@ -38,7 +38,7 @@ const handleCopy = async () => {
   <div class="space-y-2">
     <div class="flex items-center justify-between">
       <h3 class="block text-xs uppercase tracking-wider text-gray-500">
-        {{ title }}:
+        {{ title }}
       </h3>
       <slot name="action" />
     </div>
