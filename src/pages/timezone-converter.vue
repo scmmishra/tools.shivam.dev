@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, computed } from "vue";
 import { Tools } from "../tools";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextInput from "../components/form/TextInput.vue";
 import Select from "../components/form/Select.vue";
 import Result from "../components/Result.vue";
 import WithLabel from "../components/form/WithLabel.vue";
-import IconX from "~icons/ph/x";
+import IconTrash from "~icons/ph/trash";
 import IconPlus from "~icons/ph/plus";
 
 const inputTime = ref("");
@@ -233,7 +233,7 @@ function updateTimezone(id: string, value: string) {
       </div>
 
       <!-- Output Rows -->
-      <div v-for="tz in additionalTimezones" :key="tz.id" class="grid grid-cols-8 gap-4">
+      <div v-for="tz in additionalTimezones" :key="tz.id" class="grid grid-cols-9 gap-4">
         <div class="col-span-5">
           <Result
             :title="getConvertedTimeForTimezone(tz.timezone).label"
@@ -241,7 +241,7 @@ function updateTimezone(id: string, value: string) {
             placeholder="Select a timezone"
           />
         </div>
-        <div class="col-span-2">
+        <div class="col-span-3">
           <Select
             :id="`timezone-${tz.id}`"
             label="Target Timezone"
@@ -256,11 +256,11 @@ function updateTimezone(id: string, value: string) {
             <button
               :id="`remove-${tz.id}`"
               @click="removeTimezone(tz.id)"
-              class="w-full px-3 py-2 outline outline-gray-200 hover:outline-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              class="w-full px-3 py-2.5 outline outline-gray-200 hover:outline-gray-400 transition-colors flex items-center justify-center"
               aria-label="Remove timezone"
               :disabled="additionalTimezones.length === 1"
             >
-              <IconX class="text-gray-600" />
+              <IconTrash class="text-gray-600" />
             </button>
           </WithLabel>
         </div>
