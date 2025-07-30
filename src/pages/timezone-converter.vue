@@ -192,7 +192,8 @@ function removeTimezone(id: string) {
   additionalTimezones.value = additionalTimezones.value.filter(tz => tz.id !== id);
 }
 
-function updateTimezone(id: string, value: string) {
+function updateTimezone(id: string, value: string | undefined) {
+  if (!value) return;
   const tz = additionalTimezones.value.find(tz => tz.id === id);
   if (tz) {
     tz.timezone = value;
