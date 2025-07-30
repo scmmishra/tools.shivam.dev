@@ -11,6 +11,7 @@ import JsonFormatter from "./pages/json-formatter.vue";
 import NotificationTester from "./pages/notification-tester.vue";
 import SecretSharing from "./pages/secret-sharing.vue";
 import DnsRecords from "./pages/dns-records.vue";
+import TimezoneConverter from "./pages/timezone-converter.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -34,6 +35,7 @@ export enum Tools {
   NotificationTester = "notification-tester",
   SecretSharing = "secret-sharing",
   DnsRecords = "dns-records",
+  TimezoneConverter = "timezone-converter",
 }
 
 export const tools = [
@@ -147,6 +149,15 @@ export const tools = [
     description:
       "Look up DNS records for any domain using Google's public DNS service.",
     icon: "carbon:dns-services",
+    category: Category.Dev,
+  },
+  {
+    slug: Tools.TimezoneConverter,
+    title: "Timezone Converter",
+    component: TimezoneConverter,
+    description:
+      "Convert times between different timezones. Supports timestamps, ISO dates, and custom formats.",
+    icon: "carbon:time",
     category: Category.Dev,
   },
 ];
