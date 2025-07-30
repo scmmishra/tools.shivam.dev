@@ -205,7 +205,7 @@ function updateTimezone(id: string, value: string | undefined) {
   <ToolLayout :name="Tools.TimezoneConverter" :persist-keys="persistKeys">
     <div class="space-y-4">
       <!-- Input Row -->
-      <div class="grid grid-cols-8 gap-4">
+      <div class="grid grid-cols-9 gap-4">
         <div class="col-span-5">
           <TextInput
             id="time-input"
@@ -215,7 +215,7 @@ function updateTimezone(id: string, value: string | undefined) {
             persist="timezone-converter-input"
           />
         </div>
-        <div class="col-span-2">
+        <div class="col-span-3">
           <Select
             id="input-timezone"
             label="Timezone"
