@@ -12,6 +12,7 @@ import NotificationTester from "./pages/notification-tester.vue";
 import SecretSharing from "./pages/secret-sharing.vue";
 import DnsRecords from "./pages/dns-records.vue";
 import TimezoneConverter from "./pages/timezone-converter.vue";
+import QrCode from "./pages/qr-code.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -36,6 +37,7 @@ export enum Tools {
   SecretSharing = "secret-sharing",
   DnsRecords = "dns-records",
   TimezoneConverter = "timezone-converter",
+  QrCode = "qr-code",
 }
 
 export const tools = [
@@ -122,6 +124,15 @@ export const tools = [
     description:
       "Format and prettify your JSON data instantly in your browser.",
     icon: "mdi:code-json",
+    category: Category.Dev,
+  },
+  {
+    slug: Tools.QrCode,
+    title: "QR Code Generator",
+    component: QrCode,
+    description:
+      "Generate QR codes from text, URLs, or any data directly in your browser.",
+    icon: "carbon:qr-code",
     category: Category.Dev,
   },
   {
