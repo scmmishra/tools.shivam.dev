@@ -1,5 +1,6 @@
 import Secrets from "./pages/secrets.vue";
 import Color from "./pages/color.vue";
+import ColorCompare from "./pages/color-compare.vue";
 import Hmac from "./pages/hmac.vue";
 import Base64 from "./pages/base64.vue";
 import Base64Encode from "./pages/base64-encode.vue";
@@ -24,6 +25,7 @@ export enum Category {
 
 export enum Tools {
   Color = "color",
+  ColorCompare = "color-compare",
   Hmac = "hmac",
   Secrets = "secrets",
   Base64 = "base64",
@@ -73,6 +75,14 @@ export const tools = [
     component: Color,
     description:
       "Convert colors between different formats (HEX, RGB, HSL, etc.) with a live preview.",
+    category: Category.CSS,
+  },
+  {
+    slug: Tools.ColorCompare,
+    title: "Color Compare",
+    component: ColorCompare,
+    description:
+      "Compare two colors side by side with live swatches and normalized output.",
     category: Category.CSS,
   },
   {
