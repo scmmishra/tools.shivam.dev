@@ -14,6 +14,7 @@ import SecretSharing from "./pages/secret-sharing.vue";
 import DnsRecords from "./pages/dns-records.vue";
 import TimezoneConverter from "./pages/timezone-converter.vue";
 import QrCode from "./pages/qr-code.vue";
+import IndiaIncomeTax from "./pages/india-income-tax.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -21,6 +22,7 @@ export enum Category {
   CSS = "css",
   Text = "text",
   Dev = "dev",
+  Finance = "finance",
 }
 
 export enum Tools {
@@ -40,6 +42,7 @@ export enum Tools {
   DnsRecords = "dns-records",
   TimezoneConverter = "timezone-converter",
   QrCode = "qr-code",
+  IndiaIncomeTax = "india-income-tax",
 }
 
 export const tools = [
@@ -180,5 +183,14 @@ export const tools = [
       "Convert times between different timezones. Supports timestamps, ISO dates, and custom formats.",
     icon: "carbon:time",
     category: Category.Dev,
+  },
+  {
+    slug: Tools.IndiaIncomeTax,
+    title: "Income Tax Calculator",
+    component: IndiaIncomeTax,
+    description:
+      "Calculate income tax for India's new tax regime (FY 2025-26) with detailed breakdown by slab, cess, and surcharge.",
+    icon: "carbon:document",
+    category: Category.Finance,
   },
 ];
