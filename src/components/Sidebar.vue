@@ -9,20 +9,20 @@ const groupedTools = Object.values(Category).map((category) => ({
 <template>
   <aside class="sticky top-0 grid h-screen p-3 pr-0 basis-64">
     <div
-      class="flex flex-col h-full bg-white outline outline-gray-200 px-4 py-3"
+      class="flex flex-col h-full bg-white outline outline-gray-200 px-4 py-3 overflow-hidden"
     >
-      <RouterLink to="/" class="text-xl font-medium uppercase tracking-wider">
+      <RouterLink to="/" class="text-xl font-medium uppercase tracking-wider flex-shrink-0">
         Tools
       </RouterLink>
 
-      <span class="text-xs tracking-wide text-gray-600 mb-4">
+      <span class="text-xs tracking-wide text-gray-600 mb-4 flex-shrink-0">
         by
         <a class="underline" target="_blank" href="https://shivam.dev">
           shivam.dev
         </a>
       </span>
 
-      <nav class="space-y-6 mt-2">
+      <nav class="space-y-6 mt-2 overflow-y-auto flex-1">
         <div v-for="group in groupedTools" :key="group.name" class="space-y-1">
           <h3
             class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"

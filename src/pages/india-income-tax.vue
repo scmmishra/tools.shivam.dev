@@ -130,7 +130,6 @@ const formatPercentage = (rate: number): string => {
 <template>
   <ToolLayout
     :name="Tools.IndiaIncomeTax"
-    :persist-keys="['india-tax-salary']"
     print-title="Income Tax Calculation (India - New Regime FY 2025-26)"
   >
     <div class="space-y-6">
@@ -139,7 +138,6 @@ const formatPercentage = (rate: number): string => {
         label="Annual Salary (₹)"
         placeholder="Enter your annual salary"
         v-model="annualSalary"
-        persist="india-tax-salary"
         :min="0"
         :step="10000"
       />
