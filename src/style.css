@@ -3,3 +3,41 @@
 body {
   font-family: "Geist Mono Variable", monospace;
 }
+
+@media print {
+  /* Hide navigation elements */
+  aside,
+  nav,
+  dialog {
+    display: none !important;
+  }
+
+  /* Reset main content styles for print */
+  main {
+    padding: 0 !important;
+    background: white !important;
+    min-height: auto !important;
+  }
+
+  main > div {
+    background: white !important;
+    outline: none !important;
+    border: none !important;
+  }
+
+  /* Hide clear saved data button and descriptions */
+  button,
+  [data-tool-description] {
+    display: none !important;
+  }
+
+  /* Show print-specific title if available */
+  [data-print-title] {
+    display: block !important;
+  }
+
+  /* Hide regular title in print */
+  h1:not([data-print-title]) {
+    display: none !important;
+  }
+}

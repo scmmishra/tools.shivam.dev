@@ -5,6 +5,7 @@ import { tools, Tools } from "../tools";
 const props = defineProps<{
   name: Tools;
   persistKeys?: string[];
+  printTitle?: string;
 }>();
 
 const currentTool = computed(() =>
@@ -30,7 +31,10 @@ const clearCache = () => {
         <h1 class="text-xl font-medium tracking-wider truncate">
           {{ currentTool?.title }}
         </h1>
-        <div class="text-gray-600 max-w-xl mt-2">
+        <h1 v-if="printTitle" data-print-title class="hidden text-xl font-medium tracking-wider">
+          {{ printTitle }}
+        </h1>
+        <div class="text-gray-600 max-w-xl mt-2" data-tool-description>
           <slot name="description">
             <p v-if="currentTool?.description">
               {{ currentTool?.description }}

@@ -128,7 +128,11 @@ const formatPercentage = (rate: number): string => {
 </script>
 
 <template>
-  <ToolLayout :name="Tools.IndiaIncomeTax" :persist-keys="['india-tax-salary']">
+  <ToolLayout
+    :name="Tools.IndiaIncomeTax"
+    :persist-keys="['india-tax-salary']"
+    print-title="Income Tax Calculation (India - New Regime FY 2025-26)"
+  >
     <div class="space-y-6">
       <NumberInput
         id="india-tax-salary"
