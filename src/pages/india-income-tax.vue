@@ -177,25 +177,20 @@ const formatPercentage = (rate: number): string => {
           <h3 class="text-sm font-medium text-gray-700">
             Tax Calculation (New Regime)
           </h3>
-          <div class="outline outline-gray-200 p-4 space-y-3">
+          <div class="outline outline-gray-200 p-4 space-y-2">
             <div
               v-for="(slab, index) in calculation.slabBreakdown"
               :key="index"
-              class="space-y-1"
+              class="grid grid-cols-[2fr_1fr_2fr_2fr] gap-x-3 text-sm items-center"
             >
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">{{ slab.label }}</span>
-                <span class="text-gray-500">{{ formatPercentage(slab.rate) }}</span>
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500"
-                  >{{ formatCurrency(slab.taxableAmount) }} ×
-                  {{ formatPercentage(slab.rate) }}</span
-                >
-                <span class="font-mono text-gray-700">{{
-                  formatCurrency(slab.tax)
-                }}</span>
-              </div>
+              <span class="text-gray-600">{{ slab.label }}</span>
+              <span class="text-gray-500 text-right">{{ formatPercentage(slab.rate) }}</span>
+              <span class="text-gray-500 text-right whitespace-nowrap">
+                {{ formatCurrency(slab.taxableAmount) }} × {{ formatPercentage(slab.rate) }}
+              </span>
+              <span class="font-mono text-gray-700 text-right whitespace-nowrap">{{
+                formatCurrency(slab.tax)
+              }}</span>
             </div>
 
             <div
