@@ -15,6 +15,7 @@ import DnsRecords from "./pages/dns-records.vue";
 import TimezoneConverter from "./pages/timezone-converter.vue";
 import QrCode from "./pages/qr-code.vue";
 import IndiaIncomeTax from "./pages/india-income-tax.vue";
+import BountyCalculator from "./pages/bounty-calculator.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -43,6 +44,7 @@ export enum Tools {
   TimezoneConverter = "timezone-converter",
   QrCode = "qr-code",
   IndiaIncomeTax = "india-income-tax",
+  BountyCalculator = "bounty-calculator",
 }
 
 export const tools = [
@@ -192,5 +194,14 @@ export const tools = [
       "Calculate income tax for India's new tax regime (FY 2025-26) with detailed breakdown by slab, cess, and surcharge.",
     icon: "carbon:document",
     category: Category.Finance,
+  },
+  {
+    slug: Tools.BountyCalculator,
+    title: "Bounty Calculator",
+    component: BountyCalculator,
+    description:
+      "Suggest a bug bounty payout from a CVSS vector string using tier-based interpolation and component kickers.",
+    icon: "carbon:money",
+    category: Category.Security,
   },
 ];
