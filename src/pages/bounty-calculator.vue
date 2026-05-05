@@ -1,11 +1,40 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Tools } from "../tools";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextInput from "../components/form/TextInput.vue";
 
-const cvssVector = ref("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H");
+const route = useRoute();
+const router = useRouter();
+
+const DEFAULT_VECTOR = "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H";
+const initialVector =
+  typeof route.query.vector === "string" && route.query.vector
+    ? route.query.vector
+    : DEFAULT_VECTOR;
+
+const cvssVector = ref(initialVector);
 const showHowItWorks = ref(false);
+
+watch(cvssVector, (v) => {
+  const next = { ...route.query };
+  if (v) {
+    next.vector = v;
+  } else {
+    delete next.vector;
+  }
+  router.replace({ query: next });
+});
+
+watch(
+  () => route.query.vector,
+  (q) => {
+    if (typeof q === "string" && q !== cvssVector.value) {
+      cvssVector.value = q;
+    }
+  }
+);
 
 const tierRanges = {
   low: { min: 25, max: 50 },
