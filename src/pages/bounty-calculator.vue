@@ -4,6 +4,17 @@ import { useRoute, useRouter } from "vue-router";
 import { Tools } from "../tools";
 import ToolLayout from "../components/ToolLayout.vue";
 import TextInput from "../components/form/TextInput.vue";
+import {
+  parseCvss,
+  computeBaseScore,
+  severityTier,
+  REQUIRED_METRICS,
+  METRIC_FULL_NAME,
+  METRIC_VALUE_LABEL,
+  TIER_LABEL,
+  type ParsedCvss,
+  type Tier,
+} from "../utils/cvss";
 
 const route = useRoute();
 const router = useRouter();
@@ -42,130 +53,6 @@ const tierRanges = {
   high: { min: 75, max: 100 },
   critical: { min: 200, max: 300 },
 };
-
-const AV_VALUES: Record<string, number> = { N: 0.85, A: 0.62, L: 0.55, P: 0.20 };
-const AC_VALUES: Record<string, number> = { L: 0.77, H: 0.44 };
-const PR_VALUES: Record<string, { U: number; C: number }> = {
-  N: { U: 0.85, C: 0.85 },
-  L: { U: 0.62, C: 0.68 },
-  H: { U: 0.27, C: 0.50 },
-};
-const UI_VALUES: Record<string, number> = { N: 0.85, R: 0.62 };
-const CIA_VALUES: Record<string, number> = { N: 0.0, L: 0.22, H: 0.56 };
-
-interface ParsedCvss {
-  version: string;
-  AV: string;
-  AC: string;
-  PR: string;
-  UI: string;
-  S: string;
-  C: string;
-  I: string;
-  A: string;
-}
-
-type ParseResult =
-  | { ok: true; parsed: ParsedCvss }
-  | { ok: false; error: string };
-
-const REQUIRED_METRICS = ["AV", "AC", "PR", "UI", "S", "C", "I", "A"] as const;
-
-function parseCvss(vec: string): ParseResult {
-  const trimmed = vec.trim();
-  if (!trimmed) return { ok: false, error: "Enter a CVSS vector to begin." };
-
-  const parts = trimmed.split("/");
-  const head = parts[0];
-  const versionMatch = head.match(/^CVSS:(3\.0|3\.1)$/);
-  if (!versionMatch) {
-    if (head.startsWith("CVSS:4")) {
-      return {
-        ok: false,
-        error: "CVSS 4.0 not supported yet. Use a 3.0 or 3.1 vector.",
-      };
-    }
-    return { ok: false, error: "Vector must start with CVSS:3.0 or CVSS:3.1." };
-  }
-
-  const map: Record<string, string> = {};
-  for (const seg of parts.slice(1)) {
-    const [k, v] = seg.split(":");
-    if (!k || !v) return { ok: false, error: `Invalid segment: "${seg}".` };
-    map[k] = v;
-  }
-
-  for (const m of REQUIRED_METRICS) {
-    if (!(m in map)) return { ok: false, error: `Missing metric: ${m}.` };
-  }
-
-  if (!(map.AV in AV_VALUES)) return { ok: false, error: `Invalid AV value: ${map.AV}.` };
-  if (!(map.AC in AC_VALUES)) return { ok: false, error: `Invalid AC value: ${map.AC}.` };
-  if (!(map.PR in PR_VALUES)) return { ok: false, error: `Invalid PR value: ${map.PR}.` };
-  if (!(map.UI in UI_VALUES)) return { ok: false, error: `Invalid UI value: ${map.UI}.` };
-  if (map.S !== "U" && map.S !== "C") return { ok: false, error: `Invalid S value: ${map.S}.` };
-  if (!(map.C in CIA_VALUES)) return { ok: false, error: `Invalid C value: ${map.C}.` };
-  if (!(map.I in CIA_VALUES)) return { ok: false, error: `Invalid I value: ${map.I}.` };
-  if (!(map.A in CIA_VALUES)) return { ok: false, error: `Invalid A value: ${map.A}.` };
-
-  return {
-    ok: true,
-    parsed: {
-      version: versionMatch[1],
-      AV: map.AV,
-      AC: map.AC,
-      PR: map.PR,
-      UI: map.UI,
-      S: map.S,
-      C: map.C,
-      I: map.I,
-      A: map.A,
-    },
-  };
-}
-
-function cvssRoundUp(input: number): number {
-  const intInput = Math.round(input * 100000);
-  if (intInput % 10000 === 0) return intInput / 100000;
-  return (Math.floor(intInput / 10000) + 1) / 10;
-}
-
-function computeBaseScore(p: ParsedCvss): number {
-  const av = AV_VALUES[p.AV];
-  const ac = AC_VALUES[p.AC];
-  const pr = PR_VALUES[p.PR][p.S as "U" | "C"];
-  const ui = UI_VALUES[p.UI];
-  const c = CIA_VALUES[p.C];
-  const i = CIA_VALUES[p.I];
-  const a = CIA_VALUES[p.A];
-
-  const iss = 1 - (1 - c) * (1 - i) * (1 - a);
-  const impact =
-    p.S === "U"
-      ? 6.42 * iss
-      : 7.52 * (iss - 0.029) - 3.25 * Math.pow(iss - 0.02, 15);
-
-  const exploitability = 8.22 * av * ac * pr * ui;
-
-  if (impact <= 0) return 0;
-
-  const raw =
-    p.S === "U"
-      ? Math.min(impact + exploitability, 10)
-      : Math.min(1.08 * (impact + exploitability), 10);
-
-  return cvssRoundUp(raw);
-}
-
-type Tier = "none" | "low" | "medium" | "high" | "critical";
-
-function severityTier(score: number): Tier {
-  if (score === 0) return "none";
-  if (score < 4.0) return "low";
-  if (score < 7.0) return "medium";
-  if (score < 9.0) return "high";
-  return "critical";
-}
 
 const TIER_BOUNDS: Record<Exclude<Tier, "none">, [number, number]> = {
   low: [0.1, 3.9],
@@ -262,14 +149,6 @@ const calculation = computed(() => {
   };
 });
 
-const tierLabel: Record<Tier, string> = {
-  none: "None",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  critical: "Critical",
-};
-
 const tierColor: Record<Tier, string> = {
   none: "text-gray-500",
   low: "text-blue-600",
@@ -278,36 +157,14 @@ const tierColor: Record<Tier, string> = {
   critical: "text-red-600",
 };
 
-const metricFullName: Record<string, string> = {
-  AV: "Attack Vector",
-  AC: "Attack Complexity",
-  PR: "Privileges Required",
-  UI: "User Interaction",
-  S: "Scope",
-  C: "Confidentiality",
-  I: "Integrity",
-  A: "Availability",
-};
-
-const metricValueLabel: Record<string, Record<string, string>> = {
-  AV: { N: "Network", A: "Adjacent", L: "Local", P: "Physical" },
-  AC: { L: "Low", H: "High" },
-  PR: { N: "None", L: "Low", H: "High" },
-  UI: { N: "None", R: "Required" },
-  S: { U: "Unchanged", C: "Changed" },
-  C: { N: "None", L: "Low", H: "High" },
-  I: { N: "None", L: "Low", H: "High" },
-  A: { N: "None", L: "Low", H: "High" },
-};
-
 const metricRows = computed(() => {
   const p = calculation.value?.parsed;
   if (!p) return [];
   return REQUIRED_METRICS.map((m) => ({
     key: m,
-    name: metricFullName[m],
+    name: METRIC_FULL_NAME[m],
     value: p[m],
-    valueLabel: metricValueLabel[m][p[m]] ?? p[m],
+    valueLabel: METRIC_VALUE_LABEL[m][p[m]] ?? p[m],
   }));
 });
 
@@ -401,7 +258,7 @@ function loadExample(vec: string) {
               {{ calculation.score.toFixed(1) }}
             </div>
             <div class="text-xs mt-1" :class="tierColor[calculation.tier]">
-              {{ tierLabel[calculation.tier] }}
+              {{ TIER_LABEL[calculation.tier] }}
               <span class="text-gray-500"
                 >· CVSS v{{ calculation.parsed.version }}</span
               >
@@ -433,7 +290,7 @@ function loadExample(vec: string) {
               <span class="text-gray-600">
                 Tier band
                 <span class="text-xs text-gray-500"
-                  >({{ tierLabel[calculation.tier] }})</span
+                  >({{ TIER_LABEL[calculation.tier] }})</span
                 >
               </span>
               <span class="font-mono text-gray-700">

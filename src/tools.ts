@@ -16,6 +16,7 @@ import TimezoneConverter from "./pages/timezone-converter.vue";
 import QrCode from "./pages/qr-code.vue";
 import IndiaIncomeTax from "./pages/india-income-tax.vue";
 import BountyCalculator from "./pages/bounty-calculator.vue";
+import CvssCalculator from "./pages/cvss-calculator.vue";
 
 export enum Category {
   Encoding = "encoding",
@@ -45,6 +46,7 @@ export enum Tools {
   QrCode = "qr-code",
   IndiaIncomeTax = "india-income-tax",
   BountyCalculator = "bounty-calculator",
+  CvssCalculator = "cvss-calculator",
 }
 
 export const tools = [
@@ -202,6 +204,15 @@ export const tools = [
     description:
       "Suggest a bug bounty payout from a CVSS vector string using tier-based interpolation and component kickers.",
     icon: "carbon:money",
+    category: Category.Security,
+  },
+  {
+    slug: Tools.CvssCalculator,
+    title: "CVSS Calculator",
+    component: CvssCalculator,
+    description:
+      "Build a CVSS v3.1 vector by picking each metric, see the live base score and severity, and copy or share the result.",
+    icon: "carbon:security",
     category: Category.Security,
   },
 ];
